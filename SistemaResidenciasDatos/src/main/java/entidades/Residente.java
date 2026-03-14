@@ -1,6 +1,6 @@
 package entidades;
 
-import enums.EstadoENUM;
+import enums.EstadoResidenteENUM;
 import enums.GeneroENUM;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -46,7 +46,7 @@ public class Residente {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private EstadoENUM estado;
+    private EstadoResidenteENUM estado;
 
     @Column(nullable = false)
     private Integer permiso_vehicular;
@@ -71,7 +71,7 @@ public class Residente {
      * @param estado Estado del residente
      * @param permiso_vehicular  permiso vehícular del residente
      */
-    public Residente(String nombre, String apellido_paterno, String apellido_materno, LocalDate fechaNacimiento, GeneroENUM genero, String direccion, String correo, String telefono, EstadoENUM estado, Integer permiso_vehicular) {
+    public Residente(Long id, String nombre, String apellido_paterno, String apellido_materno, LocalDate fechaNacimiento, GeneroENUM genero, String direccion, String correo, String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular) {
         this.id = id;
         this.nombre = nombre;
         this.apellido_paterno = apellido_paterno;
@@ -157,11 +157,11 @@ public class Residente {
         this.telefono = telefono;
     }
 
-    public EstadoENUM getEstado() {
+    public EstadoResidenteENUM getEstado() {
         return estado;
     }
 
-    public void setEstado(EstadoENUM estado) {
+    public void setEstado(EstadoResidenteENUM estado) {
         this.estado = estado;
     }
 
@@ -195,4 +195,11 @@ public class Residente {
         final Residente other = (Residente) obj;
         return Objects.equals(this.id, other.id);
     }
+
+    @Override
+    public String toString() {
+        return "Residente{" + "id=" + id + ", nombre=" + nombre + ", apellido_paterno=" + apellido_paterno + ", apellido_materno=" + apellido_materno + ", fechaNacimiento=" + fechaNacimiento + ", genero=" + genero + ", direccion=" + direccion + ", correo=" + correo + ", telefono=" + telefono + ", estado=" + estado + ", permiso_vehicular=" + permiso_vehicular + '}';
+    }
+    
+    
 }

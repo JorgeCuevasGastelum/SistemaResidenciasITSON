@@ -8,7 +8,7 @@ package enums;
  *
  * @author Gamer
  */
-public enum EstadoENUM {
+public enum EstadoResidenteENUM {
     ACTIVO,
     INACTIVO
 }
