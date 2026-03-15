@@ -8,8 +8,7 @@ package enums;
  *
  * @author TRMrDucky
  */
-public enum EstadoHabitacion {
-    ACTIVA,
-    FINALIZADA,
-    CANCELADA
+public enum EstadoHabitacionENUM {
+    DISPONIBLE,
+    OCUPADA,
 }

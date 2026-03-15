@@ -1,5 +1,6 @@
 package entidades;
 
+import enums.EstadoHabitacionENUM;
 import enums.GeneroENUM;
 import jakarta.persistence.*;
 import java.util.Objects;
@@ -25,15 +26,19 @@ public class Habitacion {
 
     @Column(nullable = false)
     private GeneroENUM genero;
+    
+    @Column(nullable = false)
+    private EstadoHabitacionENUM estado;
 
     public Habitacion() {
     }
 
-    public Habitacion(Long id, Integer numero_habitacion, Integer capacidad, GeneroENUM genero) {
+    public Habitacion(Long id, Integer numero_habitacion, Integer capacidad, GeneroENUM genero, EstadoHabitacionENUM estado) {
         this.id = id;
         this.numero_habitacion = numero_habitacion;
         this.capacidad = capacidad;
         this.genero = genero;
+        this.estado = estado;
     }
 
     public Long getId() {
@@ -67,6 +72,16 @@ public class Habitacion {
     public void setGenero(GeneroENUM genero) {
         this.genero = genero;
     }
+
+    public EstadoHabitacionENUM getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoHabitacionENUM estado) {
+        this.estado = estado;
+    }
+    
+    
 
     @Override
     public int hashCode() {
