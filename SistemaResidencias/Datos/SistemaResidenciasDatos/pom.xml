@@ -30,6 +30,11 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>8.3.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>itson</groupId>
+            <artifactId>dto_negocios</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

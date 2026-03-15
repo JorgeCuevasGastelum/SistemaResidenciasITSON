@@ -7,6 +7,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>SistemaResidenciasNegocio</module>
+        <module>objetos_negocio</module>
+        <module>dto_negocios</module>
+        <module>negocios_AdministradorHabitaciones</module>
+        <module>negocios_AdministradorResidentes</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

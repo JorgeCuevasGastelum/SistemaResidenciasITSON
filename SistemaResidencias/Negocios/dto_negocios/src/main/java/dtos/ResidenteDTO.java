@@ -1,80 +1,44 @@
-package entidades;
+package dtos;
 
 import enums.EstadoResidenteENUM;
 import enums.GeneroENUM;
-import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.Objects;
 
-/**
- *
- * @author TRMrDucky
- */
-@Entity
-@Table(name = "residentes")
-public class Residente {
+public class ResidenteDTO {
 
-    //Declaración de atributos
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(length = 100, nullable = false)
     private String nombre;
-
-    @Column(length = 100, nullable = false)
     private String apellido_paterno;
-
-    @Column(length = 100, nullable = false)
     private String apellido_materno;
-
-    @Column(nullable = false)
     private LocalDate fechaNacimiento;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private GeneroENUM genero;
-
-    @Column(length = 200, nullable = false)
     private String direccion;
-
-    @Column(length = 150, nullable = false)
     private String correo;
-
-    @Column(length = 15, nullable = false)
     private String telefono;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private EstadoResidenteENUM estado;
-
-    @Column(nullable = false)
     private Integer permiso_vehicular;
-    
-    @Column(length = 100, nullable = false)
     private String carrera;
 
-    /**
-     * Constructor vacío
-     */
-    public Residente() {
+    public ResidenteDTO() {
     }
 
     
-    /**
-     * Constructor completo
-     * @param nombre Nombre del residente
-     * @param apellido_paterno Apellido Paterno del residente
-     * @param apellido_materno Apellido Materno del residente
-     * @param fechaNacimiento Fecha de nacimeinto del residente
-     * @param genero género del residente
-     * @param direccion dirección del residente
-     * @param correo Correo del residente
-     * @param telefono Teléfono del residente
-     * @param estado Estado del residente
-     * @param permiso_vehicular  permiso vehícular del residente
-     */
-    public Residente(Long id, String nombre, String apellido_paterno, String apellido_materno, LocalDate fechaNacimiento, GeneroENUM genero, String direccion, String correo, String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular, String carrera) {
+    /** RESIDENTE LISTADO **/
+    public ResidenteDTO(Long id, String nombre, String apellido_paterno, String apellido_materno, GeneroENUM genero, EstadoResidenteENUM estado, String carrera) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido_paterno = apellido_paterno;
+        this.apellido_materno = apellido_materno;
+        this.genero = genero;
+        this.estado = estado;
+        this.carrera = carrera;
+    }
+
+    
+    /** RESIDENTE DETALLADO **/
+    public ResidenteDTO(Long id, String nombre, String apellido_paterno, String apellido_materno,
+            LocalDate fechaNacimiento, GeneroENUM genero, String direccion,
+            String correo, String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular) {
         this.id = id;
         this.nombre = nombre;
         this.apellido_paterno = apellido_paterno;
@@ -86,7 +50,6 @@ public class Residente {
         this.telefono = telefono;
         this.estado = estado;
         this.permiso_vehicular = permiso_vehicular;
-        this.carrera = carrera;
     }
 
     public Long getId() {
@@ -183,35 +146,6 @@ public class Residente {
 
     public void setCarrera(String carrera) {
         this.carrera = carrera;
-    }
-    
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 31 * hash + Objects.hashCode(this.id);
-        hash = 31 * hash + Objects.hashCode(this.fechaNacimiento);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Residente other = (Residente) obj;
-        return Objects.equals(this.id, other.id);
-    }
-
-    @Override
-    public String toString() {
-        return "Residente{" + "id=" + id + ", nombre=" + nombre + ", apellido_paterno=" + apellido_paterno + ", apellido_materno=" + apellido_materno + ", fechaNacimiento=" + fechaNacimiento + ", genero=" + genero + ", direccion=" + direccion + ", correo=" + correo + ", telefono=" + telefono + ", estado=" + estado + ", permiso_vehicular=" + permiso_vehicular + '}';
     }
     
     
