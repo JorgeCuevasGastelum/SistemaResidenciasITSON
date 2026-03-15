@@ -6,7 +6,7 @@ package enums;
 
 /**
  *
- * @author Gamer
+ * @author TRMrDucky
  */
 public enum GeneroENUM {
     MUJER,
