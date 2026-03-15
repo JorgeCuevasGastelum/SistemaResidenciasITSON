@@ -12,5 +12,10 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     public List<ResidenteDTO> obtenerResidentesActivos() {
         return residenteBO.getResidentesActivos();
     }
+
+    @Override
+    public ResidenteDTO obtenerResidentePorId(String id) {
+        return residenteBO.getResidentePorId(id);
+    }
     
 }

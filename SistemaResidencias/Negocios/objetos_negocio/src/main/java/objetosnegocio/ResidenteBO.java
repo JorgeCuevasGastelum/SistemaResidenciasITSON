@@ -30,5 +30,11 @@ public class ResidenteBO {
 
     }
     
+    public ResidenteDTO getResidentePorId(String id) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.getResidentePorId(id); 
+
+    }
+    
     
 }

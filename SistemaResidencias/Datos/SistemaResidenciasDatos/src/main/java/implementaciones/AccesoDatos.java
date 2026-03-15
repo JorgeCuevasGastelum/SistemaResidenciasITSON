@@ -25,4 +25,9 @@ public class AccesoDatos implements IAccesoDatos {
     public List<ResidenteDTO> obtenerListadoResidentes() {
         return this.residentesDAO.obtenerListadoResidentesActivos();
     }
+
+    @Override
+    public ResidenteDTO getResidentePorId(String id) {
+        return this.residentesDAO.obtenerResidentePorId(id);
+    }
 }

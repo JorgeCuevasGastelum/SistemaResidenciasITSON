@@ -27,18 +27,18 @@ public class ResidentesDAO implements IResidentesDAO {
         //TEMPORAL NOMAS PARA PROBAR
 
         String jpql = """
-SELECT new dtos.ResidenteDTO(
-    r.id,
-    r.nombre,
-    r.apellido_paterno,
-    r.apellido_materno,
-    r.genero,
-    r.estado,
-    r.carrera
-)
-FROM Residente r
-WHERE r.estado = :estado
-""";
+            SELECT new dtos.ResidenteDTO(
+                r.id,
+                r.nombre,
+                r.apellido_paterno,
+                r.apellido_materno,
+                r.genero,
+                r.estado,
+                r.carrera
+            )
+        FROM Residente r
+        WHERE r.estado = :estado
+        """;
 
         TypedQuery<ResidenteDTO> query
                 = entityManager.createQuery(jpql, ResidenteDTO.class);
@@ -46,6 +46,42 @@ WHERE r.estado = :estado
         query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
 
         return query.getResultList();
+    }
+
+    @Override
+    public ResidenteDTO obtenerResidentePorId(String id) {
+
+        String jpql = """
+        SELECT new dtos.ResidenteDTO(
+            r.id,
+            r.nombre,
+            r.apellido_paterno,
+            r.apellido_materno,
+            r.fechaNacimiento,
+            r.genero,
+            r.direccion,
+            r.correo,
+            r.telefono,
+            r.estado,
+            r.permiso_vehicular,
+            r.carrera
+        )
+        FROM Residente r
+        WHERE r.id = :id
+    """;
+
+        TypedQuery<ResidenteDTO> query
+                = entityManager.createQuery(jpql, ResidenteDTO.class);
+
+        query.setParameter("id", id);
+
+        List<ResidenteDTO> resultados = query.getResultList();
+
+        if (resultados.isEmpty()) {
+            return null;
+        }
+
+        return resultados.get(0);
     }
 
     public void insertarDatosMock() {
@@ -57,6 +93,7 @@ WHERE r.estado = :estado
             tx.begin();
 
             Residente r1 = new Residente();
+            r1.setId("00000252274");
             r1.setNombre("Jorge");
             r1.setApellido_paterno("Cuevas");
             r1.setApellido_materno("Gastelum");
@@ -70,6 +107,7 @@ WHERE r.estado = :estado
             r1.setCarrera("Ing. Software");
 
             Residente r2 = new Residente();
+            r2.setId("00000203020");
             r2.setNombre("Joserra");
             r2.setApellido_paterno("Reynaga");
             r2.setApellido_materno("Nuñez");
@@ -83,6 +121,7 @@ WHERE r.estado = :estado
             r2.setCarrera("Ing. Software");
 
             Residente r3 = new Residente();
+            r3.setId("00000252825");
             r3.setNombre("Ari");
             r3.setApellido_paterno("Montoya");
             r3.setApellido_materno("Navarro");
@@ -96,6 +135,7 @@ WHERE r.estado = :estado
             r3.setCarrera("Ing. Software");
 
             Residente r4 = new Residente();
+            r4.setId("00000253017");
             r4.setNombre("Abril");
             r4.setApellido_paterno("Reyes");
             r4.setApellido_materno("Islas");
@@ -109,6 +149,7 @@ WHERE r.estado = :estado
             r4.setCarrera("Ing. Software");
 
             Residente r5 = new Residente();
+            r5.setId("00000249718");
             r5.setNombre("Melissa");
             r5.setApellido_paterno("Chavez");
             r5.setApellido_materno("Gutierrez");

@@ -14,10 +14,9 @@ import java.util.Objects;
 @Table(name = "residentes")
 public class Residente {
 
-    //Declaración de atributos
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 20, nullable = false) 
+    private String id; 
 
     @Column(length = 100, nullable = false)
     private String nombre;
@@ -74,7 +73,7 @@ public class Residente {
      * @param estado Estado del residente
      * @param permiso_vehicular  permiso vehícular del residente
      */
-    public Residente(Long id, String nombre, String apellido_paterno, String apellido_materno, LocalDate fechaNacimiento, GeneroENUM genero, String direccion, String correo, String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular, String carrera) {
+    public Residente(String id, String nombre, String apellido_paterno, String apellido_materno, LocalDate fechaNacimiento, GeneroENUM genero, String direccion, String correo, String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular, String carrera) {
         this.id = id;
         this.nombre = nombre;
         this.apellido_paterno = apellido_paterno;
@@ -89,11 +88,11 @@ public class Residente {
         this.carrera = carrera;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

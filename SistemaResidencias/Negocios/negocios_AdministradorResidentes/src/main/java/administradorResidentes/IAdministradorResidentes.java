@@ -6,5 +6,7 @@ import java.util.List;
 public interface IAdministradorResidentes {
 
     List<ResidenteDTO> obtenerResidentesActivos();
+    
+    ResidenteDTO obtenerResidentePorId(String id);
 
 }

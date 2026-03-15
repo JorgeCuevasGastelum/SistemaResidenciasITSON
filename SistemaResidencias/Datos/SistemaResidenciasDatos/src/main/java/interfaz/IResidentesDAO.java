@@ -5,4 +5,6 @@ import java.util.List;
 
 public interface IResidentesDAO {
     public List<ResidenteDTO> obtenerListadoResidentesActivos();
+    public ResidenteDTO obtenerResidentePorId(String id);
+    
 }
