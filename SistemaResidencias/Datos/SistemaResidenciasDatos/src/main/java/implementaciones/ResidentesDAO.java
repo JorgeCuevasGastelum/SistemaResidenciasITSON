@@ -22,8 +22,8 @@ public class ResidentesDAO implements IResidentesDAO {
     @Override
     public List<ResidenteDTO> obtenerListadoResidentesActivos() {
 
-        //TEMPORAL NOMAS PARA PROBAR
-        insertarDatosMock();
+        //TEMPORAL NOMAS PARA PROBAR QUITEN EL COMENTARIO PARA QUE CREE REGISTROS
+        //insertarDatosMock();
         //TEMPORAL NOMAS PARA PROBAR
 
         String jpql = """
@@ -130,7 +130,7 @@ public class ResidentesDAO implements IResidentesDAO {
             r3.setDireccion("Calle 3");
             r3.setCorreo("ari@itson.edu.mx");
             r3.setTelefono("6447778888");
-            r3.setEstado(EstadoResidenteENUM.INACTIVO);
+            r3.setEstado(EstadoResidenteENUM.ACTIVO);
             r3.setPermiso_vehicular(3);
             r3.setCarrera("Ing. Software");
 

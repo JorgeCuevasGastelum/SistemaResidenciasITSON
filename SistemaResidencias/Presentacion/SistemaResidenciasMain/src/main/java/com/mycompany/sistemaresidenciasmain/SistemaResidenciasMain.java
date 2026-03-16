@@ -45,10 +45,15 @@ public class SistemaResidenciasMain {
             System.out.println("no lo encontre :(");
         }
 
-        System.out.println("\n=== OBTENER HABITACIONES DISPONIBLES ===\n");
+        System.out.println("\n=== OBTENER HABITACIONES DISPONIBLES PARA RESIDENTE ===\n");
         IAdministradorHabitaciones adminHabitaciones = new AdministradorHabitaciones();
 
-        List<HabitacionDTO> habitaciones = adminHabitaciones.obtenerHabitacionDisponibles();
+        List<HabitacionDTO> habitaciones = adminHabitaciones.obtenerHabitacionDisponiblesParaResidente("00000252825");
+        // DEBE REGRESAR LA 103 YA QUE EL RESIDENTE ES HOMBRE Y ES LA UNICA HABITACION DE HOMBRE QUE ESTA DISPONIBLE
+        // 00000252274 YA TIENE UNA HABITACION NO REGRESARA NINGUNA
+        // 00000203020 YA TIENE UNA HABITACION NO REGRESA NINGUNA
+        // 00000253017 REGRESA LA 102 Y 104 YA QUE SON LAS HABITACIONES DE MUJERES Y AMBAS ESTAN DISPONIBLES
+        // 00000249718 REGRESA LA 102 Y 104 YA QUE SON LAS HABITACIONES DE MUJERES Y AMBAS ESTAN DISPONIBLES
 
         for (HabitacionDTO h : habitaciones) {
             System.out.println(

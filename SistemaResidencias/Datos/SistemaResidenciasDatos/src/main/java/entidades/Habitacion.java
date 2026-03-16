@@ -25,20 +25,17 @@ public class Habitacion {
     private Integer capacidad;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private GeneroENUM genero;
-    
-    @Column(nullable = false)
-    private EstadoHabitacionENUM estado;
 
     public Habitacion() {
     }
 
-    public Habitacion(Long id, Integer numero_habitacion, Integer capacidad, GeneroENUM genero, EstadoHabitacionENUM estado) {
+    public Habitacion(Long id, Integer numero_habitacion, Integer capacidad, GeneroENUM genero) {
         this.id = id;
         this.numero_habitacion = numero_habitacion;
         this.capacidad = capacidad;
         this.genero = genero;
-        this.estado = estado;
     }
 
     public Long getId() {
@@ -72,16 +69,6 @@ public class Habitacion {
     public void setGenero(GeneroENUM genero) {
         this.genero = genero;
     }
-
-    public EstadoHabitacionENUM getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoHabitacionENUM estado) {
-        this.estado = estado;
-    }
-    
-    
 
     @Override
     public int hashCode() {

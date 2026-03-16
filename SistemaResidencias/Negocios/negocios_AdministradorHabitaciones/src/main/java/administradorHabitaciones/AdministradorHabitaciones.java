@@ -12,6 +12,11 @@ public class AdministradorHabitaciones implements IAdministradorHabitaciones{
     public List<HabitacionDTO> obtenerHabitacionDisponibles() {
         return habitacionesBO.getHabitacionesDisponibles();
     }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesParaResidente(String id) {
+        return habitacionesBO.getHabitacionesDisponiblesParaResidente(id);
+    }
     
     
     

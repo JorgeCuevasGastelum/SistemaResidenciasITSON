@@ -5,9 +5,12 @@ import dtos.ResidenteDTO;
 import java.util.List;
 
 public interface IAccesoDatos {
-    public List<ResidenteDTO> obtenerListadoResidentes();
-    
-    public ResidenteDTO getResidentePorId(String id);
-    
-    public List<HabitacionDTO> obtenerHabitacionesDisponibles();
+
+    List<ResidenteDTO> obtenerListadoResidentes();
+
+    ResidenteDTO getResidentePorId(String id);
+
+    List<HabitacionDTO> obtenerHabitacionesDisponibles();
+
+    List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId);
 }

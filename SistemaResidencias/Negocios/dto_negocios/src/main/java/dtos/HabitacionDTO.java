@@ -1,6 +1,5 @@
 package dtos;
 
-import enums.EstadoHabitacionENUM;
 import enums.GeneroENUM;
 
 public class HabitacionDTO {
@@ -9,17 +8,15 @@ public class HabitacionDTO {
     private Integer numero_habitacion;
     private Integer capacidad;
     private GeneroENUM genero;
-    private EstadoHabitacionENUM estado;
 
     public HabitacionDTO() {
     }
 
-    public HabitacionDTO(Long id, Integer numero_habitacion, Integer capacidad, GeneroENUM genero, EstadoHabitacionENUM estado) {
+    public HabitacionDTO(Long id, Integer numero_habitacion, Integer capacidad, GeneroENUM genero) {
         this.id = id;
         this.numero_habitacion = numero_habitacion;
         this.capacidad = capacidad;
         this.genero = genero;
-        this.estado = estado;
     }
 
     
@@ -54,14 +51,5 @@ public class HabitacionDTO {
     public void setGenero(GeneroENUM genero) {
         this.genero = genero;
     }
-
-    public EstadoHabitacionENUM getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoHabitacionENUM estado) {
-        this.estado = estado;
-    }
-    
-    
+     
 }

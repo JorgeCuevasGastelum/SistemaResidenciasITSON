@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface IAdministradorHabitaciones {
      List<HabitacionDTO> obtenerHabitacionDisponibles();
+     List<HabitacionDTO> obtenerHabitacionDisponiblesParaResidente(String id);
 }

@@ -22,12 +22,7 @@ public class AccesoDatos implements IAccesoDatos {
      */
     private IHabitacionesDAO habitacionesDAO = new HabitacionesDAO(em);
     
-    /**
-     * Obtiene un residente a partir de su matricula
-     *
-     * @param matricula Matricula del residente
-     * @return DTO con los datos del residente
-     */
+    
     @Override
     public List<ResidenteDTO> obtenerListadoResidentes() {
         return this.residentesDAO.obtenerListadoResidentesActivos();
@@ -41,6 +36,11 @@ public class AccesoDatos implements IAccesoDatos {
     @Override
     public List<HabitacionDTO> obtenerHabitacionesDisponibles() {
         return this.habitacionesDAO.obtenerHabitacionesDisponibles();
+    }
+    
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId){
+        return this.habitacionesDAO.obtenerHabitacionesDisponiblesParaResidente(residenteId);
     }
     
     

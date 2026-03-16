@@ -29,5 +29,11 @@ public class HabitacionBO {
 
     }
     
+    public List<HabitacionDTO> getHabitacionesDisponiblesParaResidente(String id) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.obtenerHabitacionesDisponiblesParaResidente(id);
+
+    }
+    
     
 }
