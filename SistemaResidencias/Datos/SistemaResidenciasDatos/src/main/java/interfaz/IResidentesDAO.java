@@ -4,7 +4,9 @@ import dtos.ResidenteDTO;
 import java.util.List;
 
 public interface IResidentesDAO {
-    public List<ResidenteDTO> obtenerListadoResidentesActivos();
-    public ResidenteDTO obtenerResidentePorId(String id);
+    List<ResidenteDTO> obtenerListadoResidentesActivos();
+    ResidenteDTO obtenerResidentePorId(String id);
+    void crearResidentesMock();
+    void limpiarBaseDatos();
     
 }

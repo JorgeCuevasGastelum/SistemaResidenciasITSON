@@ -27,39 +27,32 @@ public class HabitacionesDAO implements IHabitacionesDAO {
     @Override
     public List<HabitacionDTO> obtenerHabitacionesDisponibles() {
 
-        //TEMPORAL NOMAS PARA PROBAR
-        insertarHabitacionesMock();
-        //TEMPORAL NOMAS PARA PROBAR
-        insertarAsignacionesMock();
-        //TEMPORAL NOMAS PARA PROBAR
-
         String jpql = """
         SELECT new dtos.HabitacionDTO(
             h.id,
             h.numero_habitacion,
             h.capacidad,
-            h.genero,
-            h.estado
+            h.genero
         )
         FROM Habitacion h
-        WHERE h.estado = :estado
+        WHERE (
+            SELECT COUNT(a)
+            FROM AsignacionHabitacion a
+            WHERE a.habitacion = h
+            AND a.estadoHabitacion = :estadoActiva
+        ) < h.capacidad
     """;
 
         TypedQuery<HabitacionDTO> query
                 = entityManager.createQuery(jpql, HabitacionDTO.class);
 
-        query.setParameter("estado", EstadoHabitacionENUM.DISPONIBLE);
+        query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
 
         return query.getResultList();
     }
 
     @Override
     public List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId) {
-        //TEMPORAL NOMAS PARA PROBAR
-        //insertarHabitacionesMock();
-        //TEMPORAL NOMAS PARA PROBAR
-        //insertarAsignacionesMock();
-        //TEMPORAL NOMAS PARA PROBAR
 
         String jpql = """
 SELECT new dtos.HabitacionDTO(
@@ -96,7 +89,8 @@ AND NOT EXISTS (
         return query.getResultList();
     }
 
-    public void insertarHabitacionesMock() {
+    @Override
+    public void crearHabitacionesMock() {
 
         EntityTransaction tx = entityManager.getTransaction();
 
@@ -143,51 +137,6 @@ AND NOT EXISTS (
         }
     }
 
-    public void insertarAsignacionesMock() {
-
-        EntityTransaction tx = entityManager.getTransaction();
-
-        try {
-
-            tx.begin();
-
-            Residente r1 = entityManager.find(Residente.class, "00000252274");
-            Residente r2 = entityManager.find(Residente.class, "00000203020");
-
-            Habitacion h1 = entityManager.find(Habitacion.class, 1L);
-            Habitacion h2 = entityManager.find(Habitacion.class, 2L);
-
-            AsignacionHabitacion a1 = new AsignacionHabitacion();
-            a1.setResidente(r1);
-            a1.setHabitacion(h1);
-            a1.setFechaInicio(LocalDate.of(2025, 1, 10));
-            a1.setFechaFin(LocalDate.of(2025, 6, 10));
-            a1.setCicloLectivo("2025-1");
-            a1.setEstadoHabitacion(EstadoHabitacion.ACTIVA);
-
-            AsignacionHabitacion a2 = new AsignacionHabitacion();
-            a2.setResidente(r2);
-            a2.setHabitacion(h1);
-            a2.setFechaInicio(LocalDate.of(2025, 1, 10));
-            a2.setFechaFin(LocalDate.of(2025, 6, 10));
-            a2.setCicloLectivo("2025-1");
-            a2.setEstadoHabitacion(EstadoHabitacion.ACTIVA);
-
-            entityManager.persist(a1);
-            entityManager.persist(a2);
-
-            tx.commit();
-
-            System.out.println("Asignaciones mock insertadas");
-
-        } catch (Exception e) {
-
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-
-            e.printStackTrace();
-        }
-    }
+    
 
 }

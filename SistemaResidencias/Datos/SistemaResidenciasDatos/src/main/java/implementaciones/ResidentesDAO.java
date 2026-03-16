@@ -25,7 +25,6 @@ public class ResidentesDAO implements IResidentesDAO {
         //TEMPORAL NOMAS PARA PROBAR QUITEN EL COMENTARIO PARA QUE CREE REGISTROS
         //insertarDatosMock();
         //TEMPORAL NOMAS PARA PROBAR
-
         String jpql = """
             SELECT new dtos.ResidenteDTO(
                 r.id,
@@ -84,7 +83,8 @@ public class ResidentesDAO implements IResidentesDAO {
         return resultados.get(0);
     }
 
-    public void insertarDatosMock() {
+    @Override
+    public void crearResidentesMock() {
 
         EntityTransaction tx = entityManager.getTransaction();
 
@@ -162,11 +162,26 @@ public class ResidentesDAO implements IResidentesDAO {
             r5.setPermiso_vehicular(5);
             r5.setCarrera("Ing. Software");
 
+            Residente r6 = new Residente();
+            r6.setId("00000250000");
+            r6.setNombre("Ivan");
+            r6.setApellido_paterno("Tapia");
+            r6.setApellido_materno("Moreno");
+            r6.setFechaNacimiento(LocalDate.of(1985, 11, 3));
+            r6.setGenero(GeneroENUM.HOMBRE);
+            r6.setDireccion("Calle 6");
+            r6.setCorreo("ivan.tapia@itson.edu.mx");
+            r6.setTelefono("6413378888");
+            r6.setEstado(EstadoResidenteENUM.INACTIVO);
+            r6.setPermiso_vehicular(6);
+            r6.setCarrera("Ing. Software");
+
             entityManager.persist(r1);
             entityManager.persist(r2);
             entityManager.persist(r3);
             entityManager.persist(r4);
             entityManager.persist(r5);
+            entityManager.persist(r6);
 
             tx.commit();
 
@@ -181,4 +196,31 @@ public class ResidentesDAO implements IResidentesDAO {
             e.printStackTrace();
         }
     }
+
+    public void limpiarBaseDatos() {
+
+        EntityTransaction tx = entityManager.getTransaction();
+
+        try {
+
+            tx.begin();
+
+            entityManager.createQuery("DELETE FROM AsignacionHabitacion").executeUpdate();
+            entityManager.createQuery("DELETE FROM Habitacion").executeUpdate();
+            entityManager.createQuery("DELETE FROM Residente").executeUpdate();
+
+            tx.commit();
+
+            System.out.println("Base de datos limpiada correctamente");
+
+        } catch (Exception e) {
+
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+
+            e.printStackTrace();
+        }
+    }
+
 }

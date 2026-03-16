@@ -5,9 +5,19 @@ import java.util.List;
 import objetosnegocio.ResidenteBO;
 
 public class AdministradorResidentes implements IAdministradorResidentes {
-    
+
     private ResidenteBO residenteBO = ResidenteBO.getInstance();
+
+    @Override
+    public void crearDatosMock() {
+        residenteBO.crearDatosMock();
+    }
     
+    @Override
+    public void limpiarDatosMock() {
+        residenteBO.LimpiarDatosMock();
+    }
+
     @Override
     public List<ResidenteDTO> obtenerResidentesActivos() {
         return residenteBO.getResidentesActivos();
@@ -17,5 +27,5 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     public ResidenteDTO obtenerResidentePorId(String id) {
         return residenteBO.getResidentePorId(id);
     }
-    
+
 }

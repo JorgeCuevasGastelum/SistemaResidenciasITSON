@@ -13,4 +13,10 @@ public interface IAccesoDatos {
     List<HabitacionDTO> obtenerHabitacionesDisponibles();
 
     List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId);
+    
+    boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
+    
+    void crearDatosMock();
+    
+    void limpiarBaseDatos();
 }

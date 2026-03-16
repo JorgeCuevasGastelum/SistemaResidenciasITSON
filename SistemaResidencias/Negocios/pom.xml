@@ -11,6 +11,7 @@
         <module>dto_negocios</module>
         <module>negocios_AdministradorHabitaciones</module>
         <module>negocios_AdministradorResidentes</module>
+        <module>negocios_AdministradorAsignaciones</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

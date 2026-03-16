@@ -24,6 +24,16 @@ public class ResidenteBO {
         return residenteBO;
     }
     
+    public void crearDatosMock() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        accesoDatos.crearDatosMock();
+    }
+    
+    public void LimpiarDatosMock() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        accesoDatos.limpiarBaseDatos();
+    }
+    
     public List<ResidenteDTO> getResidentesActivos() {
         IAccesoDatos accesoDatos = new AccesoDatos();
         return accesoDatos.obtenerListadoResidentes(); 

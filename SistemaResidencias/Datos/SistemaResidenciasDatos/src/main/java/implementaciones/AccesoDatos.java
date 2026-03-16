@@ -4,6 +4,7 @@ import conexion.ManejadorConexiones;
 import dtos.HabitacionDTO;
 import dtos.ResidenteDTO;
 import interfaz.IAccesoDatos;
+import interfaz.IAsignacionesDAO;
 import interfaz.IHabitacionesDAO;
 import interfaz.IResidentesDAO;
 import jakarta.persistence.EntityManager;
@@ -21,6 +22,11 @@ public class AccesoDatos implements IAccesoDatos {
      * DAO para manejar los datos de las habitaciones en la base de datos
      */
     private IHabitacionesDAO habitacionesDAO = new HabitacionesDAO(em);
+    
+    /**
+     * DAO para manejar los datos de las asignaciones de habitaciones en la base de datos
+     */
+    private IAsignacionesDAO asignacionesDAO = new AsignacionesDAO(em);
     
     
     @Override
@@ -42,6 +48,25 @@ public class AccesoDatos implements IAccesoDatos {
     public List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId){
         return this.habitacionesDAO.obtenerHabitacionesDisponiblesParaResidente(residenteId);
     }
+
+    @Override
+    public boolean asignarHabitacion(String residenteId, Integer numeroHabitacion) {
+        return this.asignacionesDAO.asignarHabitacion(residenteId, numeroHabitacion);
+    }
+    
+    @Override
+    public void crearDatosMock(){
+        residentesDAO.crearResidentesMock();
+        habitacionesDAO.crearHabitacionesMock();
+        asignacionesDAO.crearAsignacionesMock();
+    }
+
+    @Override
+    public void limpiarBaseDatos() {
+        residentesDAO.limpiarBaseDatos();
+    }
+    
+    
     
     
 }

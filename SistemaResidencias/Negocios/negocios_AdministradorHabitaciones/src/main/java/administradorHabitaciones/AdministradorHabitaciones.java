@@ -4,8 +4,8 @@ import dtos.HabitacionDTO;
 import java.util.List;
 import objetosnegocio.HabitacionBO;
 
-public class AdministradorHabitaciones implements IAdministradorHabitaciones{
-    
+public class AdministradorHabitaciones implements IAdministradorHabitaciones {
+
     private HabitacionBO habitacionesBO = HabitacionBO.getInstance();
 
     @Override
@@ -17,10 +17,5 @@ public class AdministradorHabitaciones implements IAdministradorHabitaciones{
     public List<HabitacionDTO> obtenerHabitacionDisponiblesParaResidente(String id) {
         return habitacionesBO.getHabitacionesDisponiblesParaResidente(id);
     }
-    
-    
-    
-    
-    }
-    
 
+}
