@@ -22,9 +22,7 @@ public class ResidenteDTO {
     public ResidenteDTO() {
     }
 
-    
-    /** RESIDENTE LISTADO **/
-    public ResidenteDTO(String id, String nombre, String apellido_paterno, String apellido_materno, GeneroENUM genero, EstadoResidenteENUM estado, String carrera) {
+        public ResidenteDTO(String id, String nombre, String apellido_paterno, String apellido_materno, GeneroENUM genero, EstadoResidenteENUM estado, String carrera) {
         this.id = id;
         this.nombre = nombre;
         this.apellido_paterno = apellido_paterno;
@@ -34,9 +32,7 @@ public class ResidenteDTO {
         this.carrera = carrera;
     }
 
-    
-    /** RESIDENTE DETALLADO **/
-    public ResidenteDTO(String id, String nombre, String apellido_paterno, String apellido_materno,
+        public ResidenteDTO(String id, String nombre, String apellido_paterno, String apellido_materno,
             LocalDate fechaNacimiento, GeneroENUM genero, String direccion,
             String correo, String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular, String carrera) {
         this.id = id;
