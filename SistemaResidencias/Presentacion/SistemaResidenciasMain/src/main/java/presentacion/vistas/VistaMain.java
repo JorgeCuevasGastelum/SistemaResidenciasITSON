@@ -29,6 +29,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -56,11 +57,14 @@ import presentacion.vistas.componentes.SidebarPanel;
  */
 public class VistaMain extends javax.swing.JFrame {
 
-    private static final Color MORADO = new Color(120, 80, 200);
-    private static final Color MORADO_HOVER = new Color(100, 60, 180);
-    private static final Color EXITO = new Color(40, 180, 100);
-    private static final Color TEXTO_PRINCIPAL = new Color(30, 30, 40);
-    private static final Color TEXTO_SEC = new Color(120, 120, 135);
+    private static final Color AZUL_PRIMARIO = new Color(55, 75, 190);
+    private static final Color AZUL_HOVER = new Color(45, 60, 160);
+    private static final Color EXITO = new Color(40, 160, 80);
+    private static final Color EXITO_FONDO = new Color(230, 255, 235);
+    private static final Color REGLAS_FONDO = new Color(235, 245, 255);
+    private static final Color REGLAS_BORDE = new Color(100, 150, 210);
+    private static final Color TEXTO_PRINCIPAL = new Color(40, 40, 50);
+    private static final Color TEXTO_SEC = new Color(110, 110, 120);
     private static final Color BORDE_INPUT = new Color(210, 205, 230);
     private static final Color FONDO_INPUT = new Color(250, 249, 255);
 
@@ -75,6 +79,7 @@ public class VistaMain extends javax.swing.JFrame {
     public VistaMain() {
         initComponents();
         aplicarEstilos();
+        setLocationRelativeTo(null);
     }
 
     public void setControl(AsignarHabitacionesControl control) {
@@ -125,7 +130,7 @@ public class VistaMain extends javax.swing.JFrame {
 
         estilizarTextField(buscadorResidentes, "Buscar residente...");
         estilizarComboBox(jComboBoxFiltroResidentes,
-                new String[]{"Mostrar todos", "Femenino", "Masculino"});
+                new String[]{"Mostrar todos", "Con habitacion", "Sin habitacion"});
         estilizarComboBox(jComboBoxFiltroHabitacion,
                 new String[]{"Todos los pisos", "1er piso", "2do piso", "3er piso"});
     }
@@ -134,7 +139,6 @@ public class VistaMain extends javax.swing.JFrame {
         sp.setOpaque(false);
         sp.getViewport().setOpaque(false);
         sp.setBorder(BorderFactory.createEmptyBorder());
-        // Scrollbar minimalista
         sp.getVerticalScrollBar().setUI(new ScrollBarDelgada());
         sp.getVerticalScrollBar().setPreferredSize(new Dimension(5, 0));
         sp.getVerticalScrollBar().setOpaque(false);
@@ -185,8 +189,8 @@ public class VistaMain extends javax.swing.JFrame {
                         list, value, index, isSelected, cellHasFocus);
                 lbl.setBorder(new EmptyBorder(6, 10, 6, 10));
                 lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-                lbl.setBackground(isSelected ? new Color(240, 235, 255) : Color.WHITE);
-                lbl.setForeground(isSelected ? MORADO : TEXTO_PRINCIPAL);
+                lbl.setBackground(isSelected ? new Color(240, 245, 255) : Color.WHITE);
+                lbl.setForeground(isSelected ? AZUL_PRIMARIO : TEXTO_PRINCIPAL);
                 return lbl;
             }
         });
@@ -198,14 +202,14 @@ public class VistaMain extends javax.swing.JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(255, 255, 255, 230));
+                g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
                 g2.dispose();
             }
         };
         confirmacionPanel.setOpaque(false);
         confirmacionPanel.setLayout(new BoxLayout(confirmacionPanel, BoxLayout.Y_AXIS));
-        confirmacionPanel.setBorder(new EmptyBorder(14, 14, 14, 14));
+        confirmacionPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         jPanelSeleccion.add(confirmacionPanel, BorderLayout.CENTER);
         mostrarPlaceholderConfirmacion();
     }
@@ -213,7 +217,7 @@ public class VistaMain extends javax.swing.JFrame {
     private void mostrarPlaceholderConfirmacion() {
         confirmacionPanel.removeAll();
         JLabel lbl = new JLabel(
-                "<html><center><span style='color:#787888'>Completa los pasos<br>anteriores</span></center></html>",
+                "<html><center><span style='color:#787888'>Seleccione un residente y<br>una habitación para continuar</span></center></html>",
                 SwingConstants.CENTER);
         lbl.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lbl.setAlignmentX(CENTER_ALIGNMENT);
@@ -229,7 +233,7 @@ public class VistaMain extends javax.swing.JFrame {
         jPanelResidentes.removeAll();
         for (ResidenteDTO r : residentes) {
             ResidenteCardPanel card = new ResidenteCardPanel(r);
-            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 62));
+            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 85));
             card.setAlignmentX(LEFT_ALIGNMENT);
             card.setOnSeleccion(() -> control.seleccionarResidente(r));
             tarjetasResidentes.add(card);
@@ -258,7 +262,7 @@ public class VistaMain extends javax.swing.JFrame {
         } else {
             for (HabitacionDTO h : habitaciones) {
                 HabitacionCardPanel card = new HabitacionCardPanel(h);
-                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 68));
+                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 105));
                 card.setAlignmentX(LEFT_ALIGNMENT);
                 card.setOnSeleccion(() -> control.seleccionarHabitacion(h));
                 tarjetasHabitaciones.add(card);
@@ -279,51 +283,111 @@ public class VistaMain extends javax.swing.JFrame {
     public void mostrarConfirmacion(ResidenteDTO residente, HabitacionDTO habitacion) {
         confirmacionPanel.removeAll();
 
-        JPanel banner = panelRedondeado(new Color(220, 248, 232), 10);
-        banner.setLayout(new BorderLayout(6, 0));
-        banner.setBorder(new EmptyBorder(8, 10, 8, 10));
-        banner.setMaximumSize(new Dimension(Integer.MAX_VALUE, 54));
-        banner.setAlignmentX(LEFT_ALIGNMENT);
+        JPanel resumenPanel = panelRedondeadoBorde(new Color(245, 245, 248), new Color(245, 245, 248), 10);
+        resumenPanel.setLayout(new BoxLayout(resumenPanel, BoxLayout.Y_AXIS));
+        resumenPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        resumenPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 140));
+        resumenPanel.setAlignmentX(CENTER_ALIGNMENT);
 
-        JLabel check = new JLabel(">");
-        check.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        check.setForeground(EXITO);
+        JLabel lblResiTitle = etiq("Residente");
+        JLabel lblResiVal = val(residente.getNombre() + " " + residente.getApellido_paterno());
+        JLabel lblResiCarrera = etiq("Ingeniería industrial");
 
-        JPanel textoVal = new JPanel();
-        textoVal.setLayout(new BoxLayout(textoVal, BoxLayout.Y_AXIS));
-        textoVal.setOpaque(false);
-        JLabel v1 = new JLabel("Validación exitosa");
-        v1.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        v1.setForeground(EXITO);
-        JLabel v2 = new JLabel("Habitación compatible con el residente");
-        v2.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        v2.setForeground(new Color(30, 100, 60));
-        textoVal.add(v1);
-        textoVal.add(v2);
+        resumenPanel.add(lblResiTitle);
+        resumenPanel.add(Box.createVerticalStrut(2));
+        resumenPanel.add(lblResiVal);
+        resumenPanel.add(lblResiCarrera);
 
-        banner.add(check, BorderLayout.WEST);
-        banner.add(textoVal, BorderLayout.CENTER);
+        resumenPanel.add(Box.createVerticalStrut(10));
+        JPanel separador = new JPanel();
+        separador.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        separador.setBackground(new Color(220, 220, 225));
+        resumenPanel.add(separador);
+        resumenPanel.add(Box.createVerticalStrut(10));
 
-        JPanel datos = panelRedondeado(new Color(248, 246, 255), 10);
-        datos.setLayout(new GridLayout(2, 2, 8, 4));
-        datos.setBorder(new EmptyBorder(10, 10, 10, 10));
-        datos.setMaximumSize(new Dimension(Integer.MAX_VALUE, 68));
-        datos.setAlignmentX(LEFT_ALIGNMENT);
-        datos.add(etiq("Residente"));
-        datos.add(etiq("Habitación"));
-        datos.add(val(residente.getNombre() + " " + residente.getApellido_paterno()));
-        datos.add(val("Hab. " + habitacion.getNumero_habitacion()
-                + (habitacion.getPiso() != null ? " · " + formatPiso(habitacion.getPiso()) : "")));
+        JLabel lblHabTitle = etiq("Habitacion");
+        JLabel lblHabVal = val("Habitacion " + habitacion.getNumero_habitacion());
+        JLabel lblHabPiso = etiq(habitacion.getPiso() != null ? formatPiso(habitacion.getPiso()) : "1er piso");
 
-        JButton btnConfirmar = botonPrimario("Confirmar asignación");
+        resumenPanel.add(lblHabTitle);
+        resumenPanel.add(Box.createVerticalStrut(2));
+        resumenPanel.add(lblHabVal);
+        resumenPanel.add(lblHabPiso);
+
+        JPanel bannerValidacion = panelRedondeadoBorde(EXITO_FONDO, EXITO, 10);
+        bannerValidacion.setLayout(new BoxLayout(bannerValidacion, BoxLayout.Y_AXIS));
+        bannerValidacion.setBorder(new EmptyBorder(12, 12, 12, 12));
+        bannerValidacion.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+        bannerValidacion.setAlignmentX(CENTER_ALIGNMENT);
+        
+        JPanel checkRow = new JPanel();
+        checkRow.setLayout(new BoxLayout(checkRow, BoxLayout.X_AXIS));
+        checkRow.setOpaque(false);
+        checkRow.setAlignmentX(LEFT_ALIGNMENT);
+
+        JLabel iconCheck = new JLabel(" "); 
+        java.net.URL urlCheck = getClass().getResource("/CheckIcon.png");
+        if (urlCheck != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlCheck);
+            java.awt.Image imgCheck = iconoOriginal.getImage().getScaledInstance(14, 14, java.awt.Image.SCALE_SMOOTH);
+            iconCheck.setIcon(new ImageIcon(imgCheck));
+        } else {
+            System.out.println("No se encontró CheckIcon.png");
+        }
+
+        JLabel titleVal = new JLabel("Validacion exitosa");
+        titleVal.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        titleVal.setForeground(new Color(20, 80, 40));
+        checkRow.add(iconCheck);
+        checkRow.add(titleVal);
+
+        JLabel descVal = new JLabel("<html>Validacion exitosa. La habitacion es<br>compatible con el residente.</html>");
+        descVal.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        descVal.setForeground(new Color(30, 100, 50));
+
+        descVal.setBorder(new EmptyBorder(4, 20, 0, 0));
+        descVal.setAlignmentX(LEFT_ALIGNMENT);
+
+        bannerValidacion.add(checkRow);
+        bannerValidacion.add(descVal);
+
+        JPanel bannerReglas = panelRedondeadoBorde(REGLAS_FONDO, REGLAS_BORDE, 10);
+        bannerReglas.setLayout(new BoxLayout(bannerReglas, BoxLayout.Y_AXIS));
+        bannerReglas.setBorder(new EmptyBorder(15, 15, 15, 15));
+        bannerReglas.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        bannerReglas.setAlignmentX(CENTER_ALIGNMENT);
+
+        JLabel titleReglas = new JLabel("Reglas de validacion:");
+        titleReglas.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        titleReglas.setForeground(TEXTO_PRINCIPAL);
+
+        JLabel descReglas = new JLabel("<html>"
+                + "<ul>"
+                + "<li style='margin-bottom: 2px;'>Género del residente debe coincidir con la<br>habitación</li>"
+                + "<li style='margin-bottom: 2px;'>La habitación debe tener capacidad disponible</li>"
+                + "<li>Al asignar, el estado cambia a \"Ocupada\" si se<br>llena</li>"
+                + "</ul>"
+                + "</html>");
+        descReglas.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        descReglas.setForeground(TEXTO_SEC);
+        descReglas.setBorder(new EmptyBorder(0, -15, 0, 0));
+
+        bannerReglas.add(titleReglas);
+        bannerReglas.add(Box.createVerticalStrut(5));
+        bannerReglas.add(descReglas);
+
+        JButton btnConfirmar = botonPrimario("Confirmar asignacion");
         btnConfirmar.addActionListener(e -> control.confirmarAsignacion());
 
-        confirmacionPanel.add(banner);
-        confirmacionPanel.add(Box.createVerticalStrut(10));
-        confirmacionPanel.add(datos);
-        confirmacionPanel.add(Box.createVerticalStrut(12));
+        confirmacionPanel.add(resumenPanel);
+        confirmacionPanel.add(Box.createVerticalStrut(15));
+        confirmacionPanel.add(bannerValidacion);
+        confirmacionPanel.add(Box.createVerticalStrut(15));
+        confirmacionPanel.add(bannerReglas);
+        confirmacionPanel.add(Box.createVerticalStrut(25));
         confirmacionPanel.add(btnConfirmar);
         confirmacionPanel.add(Box.createVerticalGlue());
+
         confirmacionPanel.revalidate();
         confirmacionPanel.repaint();
     }
@@ -336,17 +400,22 @@ public class VistaMain extends javax.swing.JFrame {
         body.setBackground(Color.WHITE);
         body.setBorder(new EmptyBorder(28, 28, 28, 28));
 
-        JLabel icoCheck = new JLabel(">", SwingConstants.CENTER) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(EXITO);
-                g2.fillOval(0, 0, getWidth() - 1, getHeight() - 1);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
+        JLabel icoCheck = new JLabel("", SwingConstants.CENTER);
+
+        java.net.URL urlCheck = getClass().getResource("/ConfirmIcon.png");
+        if (urlCheck != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlCheck);
+            java.awt.Image imgCheck = iconoOriginal.getImage().getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);
+            icoCheck.setIcon(new ImageIcon(imgCheck));
+        } else {
+            System.out.println("No se encontró la imagen ConfirmIcon.");
+        }
+
+        icoCheck.setOpaque(false);
+        icoCheck.setPreferredSize(new Dimension(64, 64));
+        icoCheck.setMaximumSize(new Dimension(64, 64));
+        icoCheck.setAlignmentX(CENTER_ALIGNMENT);
+
         icoCheck.setFont(new Font("Segoe UI", Font.BOLD, 28));
         icoCheck.setForeground(Color.WHITE);
         icoCheck.setOpaque(false);
@@ -440,16 +509,58 @@ public class VistaMain extends javax.swing.JFrame {
 
     private JLabel etiq(String t) {
         JLabel l = new JLabel(t);
-        l.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        l.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         l.setForeground(TEXTO_SEC);
         return l;
     }
 
     private JLabel val(String t) {
         JLabel l = new JLabel(t);
-        l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        l.setFont(new Font("Segoe UI", Font.BOLD, 13));
         l.setForeground(TEXTO_PRINCIPAL);
         return l;
+    }
+
+    private JPanel panelRedondeadoBorde(Color fondo, Color borde, int radio) {
+        return new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(fondo);
+                g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radio, radio);
+                g2.setColor(borde);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radio, radio);
+                g2.dispose();
+            }
+
+            {
+                setOpaque(false);
+            }
+        };
+    }
+
+    private JButton botonPrimario(String texto) {
+        JButton btn = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getModel().isRollover() ? AZUL_HOVER : AZUL_PRIMARIO);
+                g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setForeground(Color.WHITE);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        btn.setAlignmentX(CENTER_ALIGNMENT);
+        return btn;
     }
 
     private JLabel lblCentrado(String t, Font f, Color c) {
@@ -477,29 +588,6 @@ public class VistaMain extends javax.swing.JFrame {
         };
     }
 
-    private JButton botonPrimario(String texto) {
-        JButton btn = new JButton(texto) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getModel().isRollover() ? MORADO_HOVER : MORADO);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setForeground(Color.WHITE);
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        btn.setAlignmentX(LEFT_ALIGNMENT);
-        return btn;
-    }
-
     private JButton botonSecundario(String texto) {
         JButton btn = botonPrimario(texto);
         btn.putClientProperty("fondo", new Color(245, 242, 255));
@@ -516,7 +604,7 @@ public class VistaMain extends javax.swing.JFrame {
 
             {
                 setFont(new Font("Segoe UI", Font.PLAIN, 12));
-                setForeground(MORADO);
+                setForeground(AZUL_PRIMARIO);
                 setContentAreaFilled(false);
                 setBorderPainted(false);
                 setFocusPainted(false);
