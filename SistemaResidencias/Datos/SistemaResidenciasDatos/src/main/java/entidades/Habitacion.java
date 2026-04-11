@@ -1,6 +1,5 @@
 package entidades;
 
-import enums.EstadoHabitacionENUM;
 import enums.GeneroENUM;
 import jakarta.persistence.*;
 import java.util.Objects;
