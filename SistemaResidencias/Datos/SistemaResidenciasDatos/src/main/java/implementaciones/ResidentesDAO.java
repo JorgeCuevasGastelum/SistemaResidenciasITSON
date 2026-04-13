@@ -223,4 +223,30 @@ public class ResidentesDAO implements IResidentesDAO {
         }
     }
 
+    @Override
+    public List<ResidenteDTO> buscarResidentesSimilares(String textoComparable) {
+        //FUNCION PARA BUSCAR RESIDENTES EN LA BARRA DE BUSQUEDA
+        String jpql = """
+            SELECT new dtos.ResidenteDTO(
+                r.id,
+                r.nombre,
+                r.apellido_paterno,
+                r.apellido_materno,
+                r.genero,
+                r.estado,
+                r.carrera
+            )
+        FROM Residente r
+        WHERE r.nombre LIKE :texto 
+            OR CAST(r.id AS string) = :texto
+        """;
+
+        TypedQuery<ResidenteDTO> query
+                = entityManager.createQuery(jpql, ResidenteDTO.class);
+        
+        query.setParameter("textoComparable", "%" + textoComparable + "%");
+
+        return query.getResultList();
+    }
+
 }

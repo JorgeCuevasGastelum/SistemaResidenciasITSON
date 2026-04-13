@@ -3,6 +3,7 @@ package implementaciones;
 import conexion.ManejadorConexiones;
 import dtos.HabitacionDTO;
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import interfaz.IAccesoDatos;
 import interfaz.IAsignacionesDAO;
 import interfaz.IHabitacionesDAO;
@@ -65,8 +66,19 @@ public class AccesoDatos implements IAccesoDatos {
     public void limpiarBaseDatos() {
         residentesDAO.limpiarBaseDatos();
     }
-    
-    
-    
-    
+
+    @Override
+    public List<ResidenteDTO> obtenerResultadoBusqueda(String textoComparable) {
+        return residentesDAO.buscarResidentesSimilares(textoComparable);
+    } 
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
+        return habitacionesDAO.obtenerHabitacionDisponiblesPorGenero(genero);
+    }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
+        return habitacionesDAO.obtenerHabitacionDisponiblesPorPiso(genero, piso);
+    } 
 }

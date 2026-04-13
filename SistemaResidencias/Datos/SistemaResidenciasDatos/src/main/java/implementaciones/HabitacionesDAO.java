@@ -137,6 +137,77 @@ AND NOT EXISTS (
         }
     }
 
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
+        String jpql = """
+                    SELECT new dtos.HabitacionDTO(
+                        h.id,
+                        h.numero_habitacion,
+                        h.capacidad,
+                        h.genero
+                    )
+                    FROM Habitacion h, Residente r
+                    WHERE h.genero = :genero
+
+                    AND (
+                        SELECT COUNT(a)
+                        FROM AsignacionHabitacion a
+                        WHERE a.habitacion.id = h.id
+                        AND a.estadoHabitacion = :estadoActiva
+                    ) < h.capacidad
+
+                    AND NOT EXISTS (
+                        SELECT a2
+                        FROM AsignacionHabitacion a2
+                        WHERE a2.residente.id = :residenteId
+                        AND a2.estadoHabitacion = :estadoActiva
+                    )
+                    """;
+
+                            TypedQuery<HabitacionDTO> query
+                                    = entityManager.createQuery(jpql, HabitacionDTO.class);
+
+                            query.setParameter("genero", genero);
+                            query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+
+                            return query.getResultList();
+    }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
+        String jpql = """
+                SELECT new dtos.HabitacionDTO(
+                    h.id,
+                    h.numero_habitacion,
+                    h.capacidad,
+                    h.genero
+                )
+                FROM Habitacion h
+                LEFT JOIN AsignacionHabitacion a 
+                    ON a.habitacion.id = h.id 
+                    AND a.estadoHabitacion = :estadoActiva
+                WHERE h.genero = :genero
+                AND h.piso = :piso
+                AND NOT EXISTS (
+                    SELECT a2
+                    FROM AsignacionHabitacion a2
+                    WHERE a2.residente.id = :residenteId
+                    AND a2.estadoHabitacion = :estadoActiva
+                )
+                GROUP BY h.id, h.numero_habitacion, h.capacidad, h.genero
+                HAVING COUNT(a) < h.capacidad
+                    """;
+
+                            TypedQuery<HabitacionDTO> query
+                                    = entityManager.createQuery(jpql, HabitacionDTO.class);
+
+                            query.setParameter("genero", genero);
+                            query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+                            query.setParameter("piso", piso);
+                            return query.getResultList();
+        
+    }
+
     
 
 }

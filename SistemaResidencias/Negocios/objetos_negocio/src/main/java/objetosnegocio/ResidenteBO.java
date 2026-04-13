@@ -46,5 +46,9 @@ public class ResidenteBO {
 
     }
     
-    
+    public List<ResidenteDTO> getResidentesBusqueda(String texto) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.obtenerResultadoBusqueda(texto);
+
+    }   
 }

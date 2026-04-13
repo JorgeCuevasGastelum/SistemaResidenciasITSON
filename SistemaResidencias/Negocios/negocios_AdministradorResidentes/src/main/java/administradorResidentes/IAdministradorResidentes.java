@@ -12,5 +12,7 @@ public interface IAdministradorResidentes {
     List<ResidenteDTO> obtenerResidentesActivos();
     
     ResidenteDTO obtenerResidentePorId(String id);
+    
+    List<ResidenteDTO> obtenerResidentesBusqueda(String textoComparable);
 
 }

@@ -5,6 +5,7 @@ import administradorHabitaciones.IAdministradorHabitaciones;
 import administradorResidentes.IAdministradorResidentes;
 import dtos.HabitacionDTO;
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import java.util.List;
 import presentacion.vistas.VistaMain;
 
@@ -99,4 +100,5 @@ public class AsignarHabitacionesControl {
     public HabitacionDTO getHabitacionSeleccionada() {
         return habitacionSeleccionada;
     }
+    
 }

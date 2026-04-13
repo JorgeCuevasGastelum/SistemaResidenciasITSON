@@ -28,4 +28,10 @@ public class AdministradorResidentes implements IAdministradorResidentes {
         return residenteBO.getResidentePorId(id);
     }
 
+    @Override
+    public List<ResidenteDTO> obtenerResidentesBusqueda(String textoComparable) {
+        return residenteBO.getResidentesBusqueda(textoComparable);
+        
+    }
+
 }
