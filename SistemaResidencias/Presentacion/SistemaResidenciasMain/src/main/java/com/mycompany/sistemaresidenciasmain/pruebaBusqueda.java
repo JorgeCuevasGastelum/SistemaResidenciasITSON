@@ -23,7 +23,7 @@ public class pruebaBusqueda extends javax.swing.JFrame {
     public pruebaBusqueda() {
         initComponents();
         
-        BuscadorResidentes buscador = new BuscadorResidentes(700,300);
+        BuscadorResidentes buscador = new BuscadorResidentes(200,40);
         this.add(buscador);
     }
 

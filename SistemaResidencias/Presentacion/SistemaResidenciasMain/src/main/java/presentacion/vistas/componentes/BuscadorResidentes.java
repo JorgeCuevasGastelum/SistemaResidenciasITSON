@@ -1,8 +1,14 @@
 package presentacion.vistas.componentes;
 
 import dtos.ResidenteDTO;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.SwingWorker;
+import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import objetosnegocio.ResidenteBO;
 
 /*
@@ -19,6 +25,8 @@ public class BuscadorResidentes extends javax.swing.JPanel {
     //modelo donde almacenamos la data
     DefaultListModel<String> listModel = new DefaultListModel<>();
     ResidenteBO residenteBO = ResidenteBO.getInstance();
+    private Timer timer;
+
 
     /**
      * Creates new form BuscadorResidentes
@@ -29,29 +37,11 @@ public class BuscadorResidentes extends javax.swing.JPanel {
      */
     public BuscadorResidentes(int width, int height) {
         initComponents();
-        setSize(width,height);
-        this.buscadorResidentesInput.setSize(width,height);
-        this.popupMenu.add(searchResults);
-        this.popupMenu.setSize(width,height);
-        jList1.setModel(listModel);
-        popupMenu.setFocusable(false);
+        setSize(new Dimension(width, height));
+        aplicarEstilos();
+        configurarBuscador();
+        popupMenu.add(searchResults);
         setVisible(true);
-        
-        buscadorResidentesInput.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
-                buscar();
-            }
-
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
-                buscar();
-            }
-
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
-                buscar();
-            }
-        });
-
     }
 
     /**
@@ -80,8 +70,11 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 
         searchResults.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
+        setLayout(new java.awt.BorderLayout());
+
         buscadorResidentesInput.setFont(new java.awt.Font("Hei", 1, 18)); // NOI18N
-        buscadorResidentesInput.setForeground(new java.awt.Color(51, 123, 194));
+        buscadorResidentesInput.setForeground(new java.awt.Color(204, 204, 204));
+        buscadorResidentesInput.setText("Ingresa un nombre o id");
         buscadorResidentesInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buscadorResidentesInputActionPerformed(evt);
@@ -92,23 +85,7 @@ public class BuscadorResidentes extends javax.swing.JPanel {
                 buscadorResidentesInputKeyReleased(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addComponent(buscadorResidentesInput, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(35, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(buscadorResidentesInput, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(223, Short.MAX_VALUE))
-        );
+        add(buscadorResidentesInput, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void buscadorResidentesInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscadorResidentesInputActionPerformed
@@ -119,32 +96,142 @@ public class BuscadorResidentes extends javax.swing.JPanel {
     }//GEN-LAST:event_buscadorResidentesInputKeyReleased
     
     private void buscar() {
-        String texto = buscadorResidentesInput.getText();
-
-        if(texto.length() < 0){
+        String texto = buscadorResidentesInput.getText().trim();
+        
+        if(texto.length() < 2){
             popupMenu.setVisible(false);
             return;
         }
+        if(!texto.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+")){
+            mostrarMensaje("Entrada inválida");
+            return;
+        }
+        
+        // sanitizacion de entradas
+        texto = texto.toLowerCase(); 
+        final String fintalTexto = texto.replaceAll("[^a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]", ""); 
 
-        popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
+        new SwingWorker<List<ResidenteDTO>, Void>() {
 
-        try {
-            listModel.clear();
-
-            List<ResidenteDTO> listaResidentes = residenteBO.getResidentesBusqueda(texto);
-
-            for (ResidenteDTO residente : listaResidentes) {
-                String nombreResidente = residente.getNombre() + " "
-                        + residente.getApellido_paterno() + " "
-                        + residente.getApellido_materno();
-
-                listModel.addElement(nombreResidente);
+        @Override
+        protected List<ResidenteDTO> doInBackground() throws Exception {
+                return residenteBO.getResidentesBusqueda(fintalTexto);
             }
 
-        }   catch(Exception ex){
-                ex.printStackTrace();
-        }
+            @Override
+            protected void done() {
+                try {
+                    List<ResidenteDTO> lista = get();
+                    listModel.clear();
+
+                    if (lista.isEmpty()) {
+                        mostrarMensaje("No se encontraron resultados");
+                        return;
+                    }
+
+                    for (ResidenteDTO residente : lista) {
+                        String nombre = residente.getNombre() + " "
+                                + residente.getApellido_paterno() + " "
+                                + residente.getApellido_materno();
+
+                        listModel.addElement(nombre);
+                    }
+                        
+                    popupMenu.setPreferredSize(new Dimension(
+                        buscadorResidentesInput.getWidth(),
+                        200));
+                    
+                    popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
+
+                } catch (Exception e) {
+                    mostrarMensaje("Ha ocurrido un error");
+                }
+            }
+        }.execute();
     }
+    
+    private void configurarBuscador() {
+        timer = new Timer(200, e -> buscar()); 
+        timer.setRepeats(false);
+
+        buscadorResidentesInput.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { reiniciarTimer(); }
+            public void removeUpdate(DocumentEvent e) { reiniciarTimer(); }
+            public void changedUpdate(DocumentEvent e) { reiniciarTimer(); }
+
+            private void reiniciarTimer() {
+                timer.restart();
+            }
+        });
+    }
+    
+    private void mostrarMensaje(String mensaje) {
+        listModel.clear();
+        listModel.addElement(mensaje);
+        popupMenu.setPreferredSize(new Dimension(
+            buscadorResidentesInput.getWidth(),
+            45
+        ));
+
+        popupMenu.revalidate();
+        popupMenu.repaint();
+
+        popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
+    }
+
+    
+    
+    private void aplicarEstilos() {
+
+        buscadorResidentesInput.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200), 1, true),
+            javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
+        ));
+        buscadorResidentesInput.setCaretColor(new java.awt.Color(0, 102, 204));
+
+        // focus
+        buscadorResidentesInput.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 204), 1, true),
+                    javax.swing.BorderFactory.createEmptyBorder(7, 11, 7, 11)
+                ));
+                buscadorResidentesInput.setForeground(new java.awt.Color(40, 40, 40));
+                buscadorResidentesInput.setText("");
+            }
+
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200), 0, true),
+                    javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                ));
+                buscadorResidentesInput.setText("Ingresa un nombre o id");
+                buscadorResidentesInput.setForeground(new java.awt.Color(204, 204, 204));
+            }
+        });
+
+        // popup
+        popupMenu.setFocusable(false);
+        popupMenu.setBackground(new java.awt.Color(250, 250, 250));
+        popupMenu.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220,220,220), 1, true),
+            javax.swing.BorderFactory.createEmptyBorder(5,5,5,5)
+        ));
+
+        searchResults.setBackground(java.awt.Color.WHITE);
+
+        //lista
+        jList1.setModel(listModel);
+        jList1.setBackground(java.awt.Color.WHITE);
+        jList1.setFixedCellHeight(35);
+        jList1.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        jList1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        jScrollPane1.setBorder(null);
+        jScrollPane1.setVisible(true);
+}
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
