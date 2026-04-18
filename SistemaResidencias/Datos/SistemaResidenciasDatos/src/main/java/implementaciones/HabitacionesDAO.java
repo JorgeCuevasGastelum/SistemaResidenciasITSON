@@ -140,27 +140,26 @@ AND NOT EXISTS (
     @Override
     public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
         String jpql = """
-                    SELECT new dtos.HabitacionDTO(
+                SELECT new dtos.HabitacionDTO(
                         h.id,
                         h.numero_habitacion,
                         h.capacidad,
                         h.genero
                     )
-                    FROM Habitacion h, Residente r
+                    FROM Habitacion h
                     WHERE h.genero = :genero
-
                     AND (
                         SELECT COUNT(a)
                         FROM AsignacionHabitacion a
                         WHERE a.habitacion.id = h.id
                         AND a.estadoHabitacion = :estadoActiva
                     ) < h.capacidad
-
                     AND NOT EXISTS (
                         SELECT a2
                         FROM AsignacionHabitacion a2
                         WHERE a2.residente.id = :residenteId
                         AND a2.estadoHabitacion = :estadoActiva
+                    )
                     )
                     """;
 

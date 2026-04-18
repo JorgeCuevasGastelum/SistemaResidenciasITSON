@@ -222,10 +222,39 @@ public class ResidentesDAO implements IResidentesDAO {
             e.printStackTrace();
         }
     }
-
-    @Override
+    
+    //para el buscador
     public List<ResidenteDTO> buscarResidentesSimilares(String textoComparable) {
-        //FUNCION PARA BUSCAR RESIDENTES EN LA BARRA DE BUSQUEDA
+        String jpql = 
+        """
+            SELECT new dtos.ResidenteDTO(
+               r.id,
+                r.nombre,
+                r.apellido_paterno,
+                r.apellido_materno,
+                r.genero,
+                r.estado,
+                r.carrera
+            )
+            FROM Residente r
+            WHERE (LOWER(r.nombre) LIKE :texto 
+               OR r.id LIKE :texto)
+               AND r.estado = :estado
+        """;
+
+        TypedQuery<ResidenteDTO> query =
+                entityManager.createQuery(jpql, ResidenteDTO.class);
+
+        query.setParameter("texto", "%" + textoComparable.toLowerCase() + "%");
+        query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
+
+        return query.getResultList();
+    }
+
+
+        @Override
+    public List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero) {
+        
         String jpql = """
             SELECT new dtos.ResidenteDTO(
                 r.id,
@@ -237,16 +266,13 @@ public class ResidentesDAO implements IResidentesDAO {
                 r.carrera
             )
         FROM Residente r
-        WHERE r.nombre LIKE :texto 
-            OR CAST(r.id AS string) = :texto
+        WHERE r.genero = :genero 
         """;
 
         TypedQuery<ResidenteDTO> query
                 = entityManager.createQuery(jpql, ResidenteDTO.class);
         
-        query.setParameter("textoComparable", "%" + textoComparable + "%");
-
+        query.setParameter("genero", genero);
         return query.getResultList();
     }
-
 }

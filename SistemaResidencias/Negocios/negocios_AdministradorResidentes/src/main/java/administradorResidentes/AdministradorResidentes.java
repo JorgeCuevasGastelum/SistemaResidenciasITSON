@@ -1,6 +1,7 @@
 package administradorResidentes;
 
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import java.util.List;
 import objetosnegocio.ResidenteBO;
 
@@ -32,6 +33,11 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     public List<ResidenteDTO> obtenerResidentesBusqueda(String textoComparable) {
         return residenteBO.getResidentesBusqueda(textoComparable);
         
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerResidentePorGenero(GeneroENUM genero) {
+        return residenteBO.getResidentesGenero(genero);
     }
 
 }

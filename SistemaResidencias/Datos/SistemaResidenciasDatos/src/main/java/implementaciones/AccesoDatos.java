@@ -81,4 +81,9 @@ public class AccesoDatos implements IAccesoDatos {
     public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
         return habitacionesDAO.obtenerHabitacionDisponiblesPorPiso(genero, piso);
     } 
+
+    @Override
+    public List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero) {
+        return residentesDAO.buscarResidentesPorGenero(genero);
+    }
 }

@@ -21,6 +21,9 @@ public interface IAccesoDatos {
 
     List<ResidenteDTO> obtenerResultadoBusqueda(String textoComparable);
     
+    List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero);
+
+        
     boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
     
     void crearDatosMock();

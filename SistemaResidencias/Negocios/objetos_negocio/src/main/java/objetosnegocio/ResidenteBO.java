@@ -1,6 +1,7 @@
 package objetosnegocio;
 
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import implementaciones.AccesoDatos;
 import interfaz.IAccesoDatos;
 import java.util.List;
@@ -50,5 +51,12 @@ public class ResidenteBO {
         IAccesoDatos accesoDatos = new AccesoDatos();
         return accesoDatos.obtenerResultadoBusqueda(texto);
 
-    }   
+    }
+    
+    public List<ResidenteDTO> getResidentesGenero(GeneroENUM genero) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.buscarResidentesPorGenero(genero);
+    }
+    
+    
 }

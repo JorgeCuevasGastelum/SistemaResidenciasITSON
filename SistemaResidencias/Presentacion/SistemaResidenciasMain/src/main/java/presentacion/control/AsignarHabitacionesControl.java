@@ -56,6 +56,18 @@ public class AsignarHabitacionesControl {
 
         vista.limpiarConfirmacion();
     }
+    
+    public void filtrarResidente(GeneroENUM genero){
+           List<ResidenteDTO> residentes = adminResidentes.obtenerResidentePorGenero(genero);
+           vista.mostrarResidentes(residentes);         
+    }
+    
+    public void filtrarHabitacion(int piso){
+        ResidenteDTO residenteSeleccionado = this.getResidenteSeleccionado();
+        GeneroENUM genero = residenteSeleccionado.getGenero();
+        List<HabitacionDTO> habitaciones = adminHabitaciones.obtenerHabitacionDisponiblesPorPiso(genero, piso);
+        vista.mostrarHabitaciones(habitaciones);
+    }
 
     public void seleccionarHabitacion(HabitacionDTO habitacion) {
         if (residenteSeleccionado == null) {

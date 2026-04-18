@@ -4,11 +4,11 @@ import enums.EstadoHabitacionENUM;
 import enums.GeneroENUM;
 import jakarta.persistence.*;
 import java.util.Objects;
-
 /**
  *
  * @author TRMrDucky
  */
+
 @Entity
 @Table(name = "habitaciones")
 public class Habitacion {
@@ -27,6 +27,9 @@ public class Habitacion {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GeneroENUM genero;
+    
+    @Column(nullable = false)
+    private int piso;
 
     public Habitacion() {
     }
@@ -36,6 +39,7 @@ public class Habitacion {
         this.numero_habitacion = numero_habitacion;
         this.capacidad = capacidad;
         this.genero = genero;
+        this.piso=piso;
     }
 
     public Long getId() {
@@ -68,6 +72,14 @@ public class Habitacion {
 
     public void setGenero(GeneroENUM genero) {
         this.genero = genero;
+    }
+
+    public int getPiso() {
+        return piso;
+    }
+
+    public void setPiso(int piso) {
+        this.piso = piso;
     }
 
     @Override

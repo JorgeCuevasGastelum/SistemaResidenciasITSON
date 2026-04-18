@@ -22,6 +22,8 @@ import objetosnegocio.ResidenteBO;
  */
 public class BuscadorResidentes extends javax.swing.JPanel {
     
+    String PLACEHOLDER_TEXT = "Ingresa un nombre o ID";
+    
     //modelo donde almacenamos la data
     DefaultListModel<String> listModel = new DefaultListModel<>();
     ResidenteBO residenteBO = ResidenteBO.getInstance();
@@ -98,18 +100,23 @@ public class BuscadorResidentes extends javax.swing.JPanel {
     private void buscar() {
         String texto = buscadorResidentesInput.getText().trim();
         
+        if(texto.equals(PLACEHOLDER_TEXT)){
+            popupMenu.setVisible(false);
+            return;
+        }
+      
         if(texto.length() < 2){
             popupMenu.setVisible(false);
             return;
         }
-        if(!texto.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+")){
+        if(!texto.matches("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s]+") && !texto.equals(PLACEHOLDER_TEXT)){
             mostrarMensaje("Entrada inválida");
             return;
         }
         
         // sanitizacion de entradas
         texto = texto.toLowerCase(); 
-        final String fintalTexto = texto.replaceAll("[^a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]", ""); 
+        final String fintalTexto = texto.replaceAll("[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s]", "");
 
         new SwingWorker<List<ResidenteDTO>, Void>() {
 
@@ -120,31 +127,35 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 
             @Override
             protected void done() {
-                try {
-                    List<ResidenteDTO> lista = get();
-                    listModel.clear();
+                    try {
+                        List<ResidenteDTO> lista = get();
+                        listModel.clear();
 
-                    if (lista.isEmpty()) {
-                        mostrarMensaje("No se encontraron resultados");
-                        return;
-                    }
+                        if (lista.isEmpty()) {
+                            mostrarMensaje("No se encontraron resultados");
+                            return;
+                        }
 
-                    for (ResidenteDTO residente : lista) {
-                        String nombre = residente.getNombre() + " "
-                                + residente.getApellido_paterno() + " "
-                                + residente.getApellido_materno();
+                        for (ResidenteDTO residente : lista) {
+                            String nombre = residente.getNombre() + " "
+                                    + residente.getApellido_paterno() + " "
+                                    + residente.getApellido_materno();
 
-                        listModel.addElement(nombre);
-                    }
-                        
-                    popupMenu.setPreferredSize(new Dimension(
-                        buscadorResidentesInput.getWidth(),
-                        200));
-                    
-                    popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
+                            listModel.addElement(nombre);
+                        }
 
-                } catch (Exception e) {
-                    mostrarMensaje("Ha ocurrido un error");
+                        popupMenu.setPreferredSize(new Dimension(
+                            buscadorResidentesInput.getWidth(),
+                            200));
+
+                        popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
+
+                    } catch (Exception e) {
+                        if(fintalTexto.equals(PLACEHOLDER_TEXT)){
+                            popupMenu.setVisible(false);
+                        }else{
+                            mostrarMensaje("Ha ocurrido un error");
+                        }
                 }
             }
         }.execute();
@@ -206,7 +217,7 @@ public class BuscadorResidentes extends javax.swing.JPanel {
                     javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200), 0, true),
                     javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
                 ));
-                buscadorResidentesInput.setText("Ingresa un nombre o id");
+                buscadorResidentesInput.setText(PLACEHOLDER_TEXT);
                 buscadorResidentesInput.setForeground(new java.awt.Color(204, 204, 204));
             }
         });
