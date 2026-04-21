@@ -10,6 +10,7 @@ import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import objetosnegocio.ResidenteBO;
+import presentacion.control.AsignarHabitacionesControl;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -28,6 +29,8 @@ public class BuscadorResidentes extends javax.swing.JPanel {
     DefaultListModel<String> listModel = new DefaultListModel<>();
     ResidenteBO residenteBO = ResidenteBO.getInstance();
     private Timer timer;
+    private AsignarHabitacionesControl control;
+
 
 
     /**
