@@ -99,24 +99,29 @@ AND NOT EXISTS (
             tx.begin();
 
             Habitacion h1 = new Habitacion();
-            h1.setNumero_habitacion(101);
+            h1.setNumero_habitacion(1101);
             h1.setCapacidad(2);
             h1.setGenero(GeneroENUM.HOMBRE);
+            h1.setPiso(1);
 
             Habitacion h2 = new Habitacion();
-            h2.setNumero_habitacion(102);
+            h2.setNumero_habitacion(1102);
             h2.setCapacidad(2);
+            h1.setPiso(1);
             h2.setGenero(GeneroENUM.MUJER);
 
             Habitacion h3 = new Habitacion();
-            h3.setNumero_habitacion(103);
-            h3.setCapacidad(1);
+            h3.setNumero_habitacion(1303);
+            h3.setCapacidad(2);
             h3.setGenero(GeneroENUM.HOMBRE);
+            h3.setPiso(3);
+
 
             Habitacion h4 = new Habitacion();
-            h4.setNumero_habitacion(104);
-            h4.setCapacidad(3);
+            h4.setNumero_habitacion(1204);
+            h4.setCapacidad(2);
             h4.setGenero(GeneroENUM.MUJER);
+            h4.setPiso(2);
 
             entityManager.persist(h1);
             entityManager.persist(h2);
@@ -135,6 +140,74 @@ AND NOT EXISTS (
 
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
+        String jpql = """
+                SELECT new dtos.HabitacionDTO(
+                        h.id,
+                        h.numero_habitacion,
+                        h.capacidad,
+                        h.genero
+                    )
+                    FROM Habitacion h
+                    WHERE h.genero = :genero
+                    AND (
+                        SELECT COUNT(a)
+                        FROM AsignacionHabitacion a
+                        WHERE a.habitacion.id = h.id
+                        AND a.estadoHabitacion = :estadoActiva
+                    ) < h.capacidad
+                    AND NOT EXISTS (
+                        SELECT a2
+                        FROM AsignacionHabitacion a2
+                        WHERE a2.residente.id = :residenteId
+                        AND a2.estadoHabitacion = :estadoActiva
+                    )
+                    """;
+
+                            TypedQuery<HabitacionDTO> query
+                                    = entityManager.createQuery(jpql, HabitacionDTO.class);
+
+                            query.setParameter("genero", genero);
+                            query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+
+                            return query.getResultList();
+    }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
+        String jpql = """
+                SELECT new dtos.HabitacionDTO(
+                    h.id,
+                    h.numero_habitacion,
+                    h.capacidad,
+                    h.genero
+                )
+                FROM Habitacion h
+                LEFT JOIN AsignacionHabitacion a 
+                    ON a.habitacion.id = h.id 
+                    AND a.estadoHabitacion = :estadoActiva
+                WHERE h.genero = :genero
+                AND h.piso = :piso
+                AND NOT EXISTS (
+                    SELECT a2
+                    FROM AsignacionHabitacion a2
+                    WHERE a2.estadoHabitacion = :estadoActiva
+                )
+                GROUP BY h.id, h.numero_habitacion, h.capacidad, h.genero
+                HAVING COUNT(a) < h.capacidad
+                    """;
+
+                            TypedQuery<HabitacionDTO> query
+                                    = entityManager.createQuery(jpql, HabitacionDTO.class);
+
+                            query.setParameter("genero", genero);
+                            query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+                            query.setParameter("piso", piso);
+                            return query.getResultList();
+        
     }
 
     

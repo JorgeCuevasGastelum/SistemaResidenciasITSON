@@ -2,6 +2,7 @@ package interfaz;
 
 import dtos.HabitacionDTO;
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import java.util.List;
 
 public interface IAccesoDatos {
@@ -13,7 +14,16 @@ public interface IAccesoDatos {
     List<HabitacionDTO> obtenerHabitacionesDisponibles();
 
     List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId);
+  
+    List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero);
+
+    List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso);
+
+    List<ResidenteDTO> obtenerResultadoBusqueda(String textoComparable);
     
+    List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero);
+
+        
     boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
     
     void crearDatosMock();

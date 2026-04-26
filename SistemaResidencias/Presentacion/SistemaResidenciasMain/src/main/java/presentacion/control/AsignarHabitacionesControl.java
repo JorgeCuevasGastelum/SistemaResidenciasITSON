@@ -5,6 +5,7 @@ import administradorHabitaciones.IAdministradorHabitaciones;
 import administradorResidentes.IAdministradorResidentes;
 import dtos.HabitacionDTO;
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import java.util.List;
 import presentacion.vistas.VistaMain;
 
@@ -55,6 +56,18 @@ public class AsignarHabitacionesControl {
 
         vista.limpiarConfirmacion();
     }
+    
+    public void filtrarResidente(GeneroENUM genero){
+           List<ResidenteDTO> residentes = adminResidentes.obtenerResidentePorGenero(genero);
+           vista.mostrarResidentes(residentes);         
+    }
+    
+    public void filtrarHabitacion(int piso){
+        ResidenteDTO residenteSeleccionado = this.getResidenteSeleccionado();
+        GeneroENUM genero = residenteSeleccionado.getGenero();
+        List<HabitacionDTO> habitaciones = adminHabitaciones.obtenerHabitacionDisponiblesPorPiso(genero, piso);
+        vista.mostrarHabitaciones(habitaciones);
+    }
 
     public void seleccionarHabitacion(HabitacionDTO habitacion) {
         if (residenteSeleccionado == null) {
@@ -99,4 +112,5 @@ public class AsignarHabitacionesControl {
     public HabitacionDTO getHabitacionSeleccionada() {
         return habitacionSeleccionada;
     }
+    
 }

@@ -6,6 +6,7 @@ package presentacion.vistas;
 
 import dtos.HabitacionDTO;
 import dtos.ResidenteDTO;
+import enums.GeneroENUM;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -46,6 +47,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import presentacion.control.AsignarHabitacionesControl;
+import presentacion.vistas.componentes.BuscadorResidentes;
 import presentacion.vistas.componentes.HabitacionCardPanel;
 import presentacion.vistas.componentes.ResidenteCardPanel;
 import presentacion.vistas.componentes.SidebarItem;
@@ -80,6 +82,7 @@ public class VistaMain extends javax.swing.JFrame {
         initComponents();
         aplicarEstilos();
         setLocationRelativeTo(null);
+        inicializarComboBoxes();
     }
 
     public void setControl(AsignarHabitacionesControl control) {
@@ -128,10 +131,10 @@ public class VistaMain extends javax.swing.JFrame {
         jPanelSeleccion.setLayout(new BorderLayout());
         construirPanelConfirmacion();
 
-        estilizarTextField(buscadorResidentes, "Buscar residente...");
-        estilizarComboBox(jComboBoxFiltroResidentes,
+        this.panelBuscador.add(new BuscadorResidentes(72,23));
+        estilizarComboBox(comboFiltroResidente,
                 new String[]{"Mostrar todos", "Con habitacion", "Sin habitacion"});
-        estilizarComboBox(jComboBoxFiltroHabitacion,
+        estilizarComboBox(comboFiltroHabitaciones,
                 new String[]{"Todos los pisos", "1er piso", "2do piso", "3er piso"});
     }
 
@@ -142,36 +145,6 @@ public class VistaMain extends javax.swing.JFrame {
         sp.getVerticalScrollBar().setUI(new ScrollBarDelgada());
         sp.getVerticalScrollBar().setPreferredSize(new Dimension(5, 0));
         sp.getVerticalScrollBar().setOpaque(false);
-    }
-
-    private void estilizarTextField(JTextField tf, String placeholder) {
-        tf.setText(placeholder);
-        tf.setForeground(TEXTO_SEC);
-        tf.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-        tf.setOpaque(true);
-        tf.setBackground(FONDO_INPUT);
-        tf.setBorder(BorderFactory.createCompoundBorder(
-                new BordereRedondeado(BORDE_INPUT, 10),
-                new EmptyBorder(0, 10, 0, 10)));
-        tf.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (tf.getText().equals(placeholder)) {
-                    tf.setText("");
-                    tf.setForeground(TEXTO_PRINCIPAL);
-                    tf.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (tf.getText().isEmpty()) {
-                    tf.setText(placeholder);
-                    tf.setForeground(TEXTO_SEC);
-                    tf.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-                }
-            }
-        });
     }
 
     private void estilizarComboBox(JComboBox<String> cb, String[] opciones) {
@@ -243,7 +216,7 @@ public class VistaMain extends javax.swing.JFrame {
         jPanelResidentes.revalidate();
         jPanelResidentes.repaint();
     }
-
+    
     public void marcarResidenteSeleccionado(ResidenteDTO residente) {
         tarjetasResidentes.forEach(c
                 -> c.setSeleccionado(c.getResidente().getId().equals(residente.getId())));
@@ -703,6 +676,14 @@ public class VistaMain extends javax.swing.JFrame {
         }
         private static final Color FONDO_INPUT = new Color(250, 249, 255);
     }
+    
+    private void inicializarComboBoxes(){
+        
+        //COMBO FILTRO RESIDENTES
+        this.comboFiltroResidente.addItem("MUJERES");
+        this.comboFiltroResidente.addItem("HOMBRES");   
+        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -715,15 +696,15 @@ public class VistaMain extends javax.swing.JFrame {
 
         jPanelSideBar = new javax.swing.JPanel();
         jPanelSeleccion = new javax.swing.JPanel();
-        jComboBoxFiltroHabitacion = new javax.swing.JComboBox<>();
-        jComboBoxFiltroResidentes = new javax.swing.JComboBox<>();
-        buscadorResidentes = new javax.swing.JTextField();
+        comboFiltroHabitaciones = new javax.swing.JComboBox<>();
+        comboFiltroResidente = new javax.swing.JComboBox<>();
         jScrollPaneHabitacion = new javax.swing.JScrollPane();
         jPanelHabitacion = new javax.swing.JPanel();
         jScrollPaneResidentes = new javax.swing.JScrollPane();
         jPanelResidentes = new javax.swing.JPanel();
         jLabelLogo = new javax.swing.JLabel();
         jLabelFondo = new javax.swing.JLabel();
+        panelBuscador = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1280, 832));
@@ -755,19 +736,21 @@ public class VistaMain extends javax.swing.JFrame {
 
         getContentPane().add(jPanelSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(950, 230, 280, 560));
 
-        jComboBoxFiltroHabitacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        getContentPane().add(jComboBoxFiltroHabitacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 260, 270, 40));
-
-        jComboBoxFiltroResidentes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBoxFiltroResidentes.addActionListener(new java.awt.event.ActionListener() {
+        comboFiltroHabitaciones.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboFiltroHabitaciones.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxFiltroResidentesActionPerformed(evt);
+                comboFiltroHabitacionesActionPerformed(evt);
             }
         });
-        getContentPane().add(jComboBoxFiltroResidentes, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 260, 280, 40));
+        getContentPane().add(comboFiltroHabitaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 260, 270, 40));
 
-        buscadorResidentes.setText("jTextField1");
-        getContentPane().add(buscadorResidentes, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 310, 280, 40));
+        comboFiltroResidente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboFiltroResidente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboFiltroResidenteActionPerformed(evt);
+            }
+        });
+        getContentPane().add(comboFiltroResidente, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 260, 280, 40));
 
         jScrollPaneHabitacion.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -809,17 +792,40 @@ public class VistaMain extends javax.swing.JFrame {
         jLabelFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/AsignarHabitacionFondo.png"))); // NOI18N
         getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
+        panelBuscador.setPreferredSize(new java.awt.Dimension(72, 23));
+        panelBuscador.setLayout(new java.awt.BorderLayout());
+        getContentPane().add(panelBuscador, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 310, 280, 40));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBoxFiltroResidentesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxFiltroResidentesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBoxFiltroResidentesActionPerformed
+    private void comboFiltroResidenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboFiltroResidenteActionPerformed
+       String generoSeleccionado =  this.comboFiltroResidente.getSelectedItem().toString();
+       GeneroENUM genero;
+       if(generoSeleccionado.equals("MUJERES")){
+            control.filtrarResidente(GeneroENUM.MUJER);
+
+       }else if(generoSeleccionado.equals("HOMBRES")){
+            control.filtrarResidente(GeneroENUM.HOMBRE);
+       }else{
+            control.cargarResidentes();
+        }
+       
+    }//GEN-LAST:event_comboFiltroResidenteActionPerformed
+
+    private void comboFiltroHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboFiltroHabitacionesActionPerformed
+
+        int pisoSeleccionado =  this.comboFiltroHabitaciones.getSelectedIndex();
+        if(pisoSeleccionado==0){
+            return;
+        }else{
+            control.filtrarHabitacion(pisoSeleccionado);
+        }
+    }//GEN-LAST:event_comboFiltroHabitacionesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField buscadorResidentes;
-    private javax.swing.JComboBox<String> jComboBoxFiltroHabitacion;
-    private javax.swing.JComboBox<String> jComboBoxFiltroResidentes;
+    private javax.swing.JComboBox<String> comboFiltroHabitaciones;
+    private javax.swing.JComboBox<String> comboFiltroResidente;
     private javax.swing.JLabel jLabelFondo;
     private javax.swing.JLabel jLabelLogo;
     private javax.swing.JPanel jPanelHabitacion;
@@ -828,5 +834,6 @@ public class VistaMain extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelSideBar;
     private javax.swing.JScrollPane jScrollPaneHabitacion;
     private javax.swing.JScrollPane jScrollPaneResidentes;
+    private javax.swing.JPanel panelBuscador;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,6 +1,7 @@
 package objetosnegocio;
 
 import dtos.HabitacionDTO;
+import enums.GeneroENUM;
 import implementaciones.AccesoDatos;
 import interfaz.IAccesoDatos;
 import java.util.List;
@@ -33,6 +34,17 @@ public class HabitacionBO {
         IAccesoDatos accesoDatos = new AccesoDatos();
         return accesoDatos.obtenerHabitacionesDisponiblesParaResidente(id);
 
+    }
+    
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.obtenerHabitacionDisponiblesPorGenero(genero);
+
+    }
+    
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.obtenerHabitacionDisponiblesPorPiso(genero, piso);
     }
     
     
