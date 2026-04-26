@@ -8,7 +8,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * JPanel que funciona como botón seleccionable para una Habitación.
+ * JPanel que funciona como botón seleccionable para una Habitación..
  */
 public class HabitacionCardPanel extends JPanel {
 
