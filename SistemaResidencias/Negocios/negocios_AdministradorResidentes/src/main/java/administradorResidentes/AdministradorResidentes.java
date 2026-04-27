@@ -13,7 +13,7 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     public void crearDatosMock() {
         residenteBO.crearDatosMock();
     }
-    
+
     @Override
     public void limpiarDatosMock() {
         residenteBO.LimpiarDatosMock();
@@ -32,7 +32,6 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     @Override
     public List<ResidenteDTO> obtenerResidentesBusqueda(String textoComparable) {
         return residenteBO.getResidentesBusqueda(textoComparable);
-        
     }
 
     @Override
@@ -40,4 +39,13 @@ public class AdministradorResidentes implements IAdministradorResidentes {
         return residenteBO.getResidentesGenero(genero);
     }
 
+    @Override
+    public List<ResidenteDTO> obtenerResidentesConHabitacion() {
+        return residenteBO.getResidentesConHabitacion();
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerResidentesSinHabitacion() {
+        return residenteBO.getResidentesSinHabitacion();
+    }
 }

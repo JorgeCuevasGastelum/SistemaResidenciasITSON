@@ -1,19 +1,13 @@
 package implementaciones;
 
 import dtos.HabitacionDTO;
-import entidades.AsignacionHabitacion;
 import entidades.Habitacion;
-import entidades.Residente;
-import enums.EstadoAsignacionENUM;
 import enums.EstadoHabitacion;
-import enums.EstadoHabitacionENUM;
-import enums.EstadoResidenteENUM;
 import enums.GeneroENUM;
 import interfaz.IHabitacionesDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
-import java.time.LocalDate;
 import java.util.List;
 
 public class HabitacionesDAO implements IHabitacionesDAO {
@@ -30,9 +24,14 @@ public class HabitacionesDAO implements IHabitacionesDAO {
         String jpql = """
         SELECT new dtos.HabitacionDTO(
             h.id,
+            h.piso,
             h.numero_habitacion,
             h.capacidad,
-            h.genero
+            h.genero,
+            (SELECT COUNT(a)
+             FROM AsignacionHabitacion a
+             WHERE a.habitacion = h
+             AND a.estadoHabitacion = :estadoActiva)
         )
         FROM Habitacion h
         WHERE (
@@ -57,27 +56,18 @@ public class HabitacionesDAO implements IHabitacionesDAO {
         String jpql = """
 SELECT new dtos.HabitacionDTO(
     h.id,
+    h.piso,
     h.numero_habitacion,
     h.capacidad,
-    h.genero
+    h.genero,
+    (SELECT COUNT(a)
+     FROM AsignacionHabitacion a
+     WHERE a.habitacion.id = h.id
+     AND a.estadoHabitacion = :estadoActiva)
 )
 FROM Habitacion h, Residente r
 WHERE r.id = :residenteId
 AND h.genero = r.genero
-
-AND (
-    SELECT COUNT(a)
-    FROM AsignacionHabitacion a
-    WHERE a.habitacion.id = h.id
-    AND a.estadoHabitacion = :estadoActiva
-) < h.capacidad
-
-AND NOT EXISTS (
-    SELECT a2
-    FROM AsignacionHabitacion a2
-    WHERE a2.residente.id = :residenteId
-    AND a2.estadoHabitacion = :estadoActiva
-)
 """;
 
         TypedQuery<HabitacionDTO> query
@@ -85,6 +75,64 @@ AND NOT EXISTS (
 
         query.setParameter("residenteId", residenteId);
         query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
+        String jpql = """
+                SELECT new dtos.HabitacionDTO(
+                    h.id,
+                    h.numero_habitacion,
+                    h.capacidad,
+                    h.genero
+                )
+                FROM Habitacion h
+                WHERE h.genero = :genero
+                AND (
+                    SELECT COUNT(a)
+                    FROM AsignacionHabitacion a
+                    WHERE a.habitacion.id = h.id
+                    AND a.estadoHabitacion = :estadoActiva
+                ) < h.capacidad
+                """;
+
+        TypedQuery<HabitacionDTO> query
+                = entityManager.createQuery(jpql, HabitacionDTO.class);
+
+        query.setParameter("genero", genero);
+        query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
+        String jpql = """
+                SELECT new dtos.HabitacionDTO(
+                    h.id,
+                    h.numero_habitacion,
+                    h.capacidad,
+                    h.genero
+                )
+                FROM Habitacion h
+                WHERE h.genero = :genero
+                AND h.piso = :piso
+                AND (
+                    SELECT COUNT(a)
+                    FROM AsignacionHabitacion a
+                    WHERE a.habitacion.id = h.id
+                    AND a.estadoHabitacion = :estadoActiva
+                ) < h.capacidad
+                """;
+
+        TypedQuery<HabitacionDTO> query
+                = entityManager.createQuery(jpql, HabitacionDTO.class);
+
+        query.setParameter("genero", genero);
+        query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+        query.setParameter("piso", piso);
 
         return query.getResultList();
     }
@@ -107,15 +155,14 @@ AND NOT EXISTS (
             Habitacion h2 = new Habitacion();
             h2.setNumero_habitacion(1102);
             h2.setCapacidad(2);
-            h1.setPiso(1);
             h2.setGenero(GeneroENUM.MUJER);
+            h2.setPiso(1);
 
             Habitacion h3 = new Habitacion();
             h3.setNumero_habitacion(1303);
             h3.setCapacidad(2);
             h3.setGenero(GeneroENUM.HOMBRE);
             h3.setPiso(3);
-
 
             Habitacion h4 = new Habitacion();
             h4.setNumero_habitacion(1204);
@@ -141,75 +188,5 @@ AND NOT EXISTS (
             e.printStackTrace();
         }
     }
-
-    @Override
-    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
-        String jpql = """
-                SELECT new dtos.HabitacionDTO(
-                        h.id,
-                        h.numero_habitacion,
-                        h.capacidad,
-                        h.genero
-                    )
-                    FROM Habitacion h
-                    WHERE h.genero = :genero
-                    AND (
-                        SELECT COUNT(a)
-                        FROM AsignacionHabitacion a
-                        WHERE a.habitacion.id = h.id
-                        AND a.estadoHabitacion = :estadoActiva
-                    ) < h.capacidad
-                    AND NOT EXISTS (
-                        SELECT a2
-                        FROM AsignacionHabitacion a2
-                        WHERE a2.residente.id = :residenteId
-                        AND a2.estadoHabitacion = :estadoActiva
-                    )
-                    """;
-
-                            TypedQuery<HabitacionDTO> query
-                                    = entityManager.createQuery(jpql, HabitacionDTO.class);
-
-                            query.setParameter("genero", genero);
-                            query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
-
-                            return query.getResultList();
-    }
-
-    @Override
-    public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
-        String jpql = """
-                SELECT new dtos.HabitacionDTO(
-                    h.id,
-                    h.numero_habitacion,
-                    h.capacidad,
-                    h.genero
-                )
-                FROM Habitacion h
-                LEFT JOIN AsignacionHabitacion a 
-                    ON a.habitacion.id = h.id 
-                    AND a.estadoHabitacion = :estadoActiva
-                WHERE h.genero = :genero
-                AND h.piso = :piso
-                AND NOT EXISTS (
-                    SELECT a2
-                    FROM AsignacionHabitacion a2
-                    WHERE a2.estadoHabitacion = :estadoActiva
-                )
-                GROUP BY h.id, h.numero_habitacion, h.capacidad, h.genero
-                HAVING COUNT(a) < h.capacidad
-                    """;
-
-                            TypedQuery<HabitacionDTO> query
-                                    = entityManager.createQuery(jpql, HabitacionDTO.class);
-
-                            query.setParameter("genero", genero);
-                            query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
-                            query.setParameter("piso", piso);
-                            return query.getResultList();
-        
-    }
-
-    
 
 }

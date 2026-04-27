@@ -67,7 +67,7 @@ public class VistaMain extends javax.swing.JFrame {
     private static final Color REGLAS_BORDE = new Color(100, 150, 210);
     private static final Color TEXTO_PRINCIPAL = new Color(40, 40, 50);
     private static final Color TEXTO_SEC = new Color(110, 110, 120);
-    private static final Color BORDE_INPUT = new Color(210, 205, 230);
+    private static final Color BORDE_INPUT = new Color(175, 160, 215);
     private static final Color FONDO_INPUT = new Color(250, 249, 255);
 
     private AsignarHabitacionesControl control;
@@ -131,7 +131,9 @@ public class VistaMain extends javax.swing.JFrame {
         jPanelSeleccion.setLayout(new BorderLayout());
         construirPanelConfirmacion();
 
-        this.panelBuscador.add(new BuscadorResidentes(72,23));
+        BuscadorResidentes buscador = new BuscadorResidentes(72, 23);
+        buscador.setOnResultados(lista -> mostrarResidentes(lista));
+        this.panelBuscador.add(buscador);
         estilizarComboBox(comboFiltroResidente,
                 new String[]{"Mostrar todos", "Con habitacion", "Sin habitacion"});
         estilizarComboBox(comboFiltroHabitaciones,
@@ -209,6 +211,7 @@ public class VistaMain extends javax.swing.JFrame {
             card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 85));
             card.setAlignmentX(LEFT_ALIGNMENT);
             card.setOnSeleccion(() -> control.seleccionarResidente(r));
+            card.setOnVistaPrevia(() -> mostrarVistaRapida(r));
             tarjetasResidentes.add(card);
             jPanelResidentes.add(card);
             jPanelResidentes.add(Box.createVerticalStrut(5));
@@ -253,7 +256,11 @@ public class VistaMain extends javax.swing.JFrame {
                         .equals(habitacion.getNumero_habitacion())));
     }
 
-    public void mostrarConfirmacion(ResidenteDTO residente, HabitacionDTO habitacion) {
+    public void actualizarEstadoReasignacion(boolean esReasignacion) {
+        // visual hint can be added to a header label if desired; currently handled in mostrarConfirmacion
+    }
+
+    public void mostrarConfirmacion(ResidenteDTO residente, HabitacionDTO habitacion, boolean esReasignacion) {
         confirmacionPanel.removeAll();
 
         JPanel resumenPanel = panelRedondeadoBorde(new Color(245, 245, 248), new Color(245, 245, 248), 10);
@@ -264,7 +271,7 @@ public class VistaMain extends javax.swing.JFrame {
 
         JLabel lblResiTitle = etiq("Residente");
         JLabel lblResiVal = val(residente.getNombre() + " " + residente.getApellido_paterno());
-        JLabel lblResiCarrera = etiq("Ingeniería industrial");
+        JLabel lblResiCarrera = etiq(residente.getCarrera() != null ? residente.getCarrera() : "");
 
         resumenPanel.add(lblResiTitle);
         resumenPanel.add(Box.createVerticalStrut(2));
@@ -349,16 +356,49 @@ public class VistaMain extends javax.swing.JFrame {
         bannerReglas.add(Box.createVerticalStrut(5));
         bannerReglas.add(descReglas);
 
-        JButton btnConfirmar = botonPrimario("Confirmar asignacion");
+        JButton btnConfirmar = botonPrimario(
+                esReasignacion ? "Confirmar reasignacion" : "Confirmar asignacion");
         btnConfirmar.addActionListener(e -> control.confirmarAsignacion());
+
+        JButton btnCancelar = botonSecundario("Cancelar");
+        btnCancelar.addActionListener(e -> control.reiniciarFlujo());
 
         confirmacionPanel.add(resumenPanel);
         confirmacionPanel.add(Box.createVerticalStrut(15));
-        confirmacionPanel.add(bannerValidacion);
-        confirmacionPanel.add(Box.createVerticalStrut(15));
-        confirmacionPanel.add(bannerReglas);
+
+        if (esReasignacion) {
+            JPanel bannerReasignacion = panelRedondeadoBorde(
+                    new Color(255, 248, 225), new Color(220, 150, 30), 10);
+            bannerReasignacion.setLayout(new BoxLayout(bannerReasignacion, BoxLayout.Y_AXIS));
+            bannerReasignacion.setBorder(new EmptyBorder(12, 12, 12, 12));
+            bannerReasignacion.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+            bannerReasignacion.setAlignmentX(CENTER_ALIGNMENT);
+
+            JLabel titleAviso = new JLabel("Reasignacion de habitacion");
+            titleAviso.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            titleAviso.setForeground(new Color(120, 75, 10));
+
+            JLabel descAviso = new JLabel(
+                    "<html>El residente ya tiene una habitacion asignada.<br>"
+                    + "Al confirmar, la asignacion actual sera cancelada.</html>");
+            descAviso.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            descAviso.setForeground(new Color(150, 90, 20));
+            descAviso.setBorder(new EmptyBorder(4, 0, 0, 0));
+            descAviso.setAlignmentX(LEFT_ALIGNMENT);
+
+            bannerReasignacion.add(titleAviso);
+            bannerReasignacion.add(descAviso);
+
+            confirmacionPanel.add(bannerReasignacion);
+        } else {
+            confirmacionPanel.add(bannerValidacion);
+            confirmacionPanel.add(Box.createVerticalStrut(15));
+            confirmacionPanel.add(bannerReglas);
+        }
         confirmacionPanel.add(Box.createVerticalStrut(25));
         confirmacionPanel.add(btnConfirmar);
+        confirmacionPanel.add(Box.createVerticalStrut(8));
+        confirmacionPanel.add(btnCancelar);
         confirmacionPanel.add(Box.createVerticalGlue());
 
         confirmacionPanel.revalidate();
@@ -450,6 +490,85 @@ public class VistaMain extends javax.swing.JFrame {
 
     public void mostrarErrorAsignacion(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void mostrarVistaRapida(ResidenteDTO r) {
+        ResidenteDTO full = control.obtenerResidenteDetalle(r.getId());
+        if (full == null) full = r;
+        r = full;
+        JPanel body = new JPanel();
+        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        body.setBackground(Color.WHITE);
+        body.setBorder(new EmptyBorder(24, 28, 24, 28));
+
+        String nombreCompleto = (r.getNombre() != null ? r.getNombre() : "")
+                + " " + (r.getApellido_paterno() != null ? r.getApellido_paterno() : "")
+                + (r.getApellido_materno() != null ? " " + r.getApellido_materno() : "");
+        body.add(lblCentrado(nombreCompleto.trim(), new Font("Segoe UI", Font.BOLD, 15), TEXTO_PRINCIPAL));
+        body.add(Box.createVerticalStrut(8));
+
+        boolean esFem = r.getGenero() != null && r.getGenero().name().equalsIgnoreCase("MUJER");
+        Color genColor = esFem ? new Color(208, 105, 186) : new Color(63, 84, 150);
+        String genText = esFem ? "femenino" : "masculino";
+        JLabel chipGen = new JLabel(genText, SwingConstants.CENTER) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(genColor);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        chipGen.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        chipGen.setForeground(Color.WHITE);
+        chipGen.setBorder(new EmptyBorder(3, 14, 3, 14));
+        chipGen.setOpaque(false);
+        chipGen.setAlignmentX(CENTER_ALIGNMENT);
+        body.add(chipGen);
+        body.add(Box.createVerticalStrut(16));
+
+        JPanel det = panelRedondeado(new Color(248, 246, 255), 10);
+        det.setLayout(new java.awt.GridBagLayout());
+        java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+        gbc.insets = new java.awt.Insets(4, 8, 4, 8);
+        gbc.anchor = java.awt.GridBagConstraints.WEST;
+
+        String[][] filas = {
+            {"Matricula", r.getId() != null ? r.getId() : "-"},
+            {"Carrera", r.getCarrera() != null ? r.getCarrera() : "-"},
+            {"Correo", r.getCorreo() != null ? r.getCorreo() : "-"},
+            {"Telefono", r.getTelefono() != null ? r.getTelefono() : "-"}
+        };
+        for (int i = 0; i < filas.length; i++) {
+            gbc.gridx = 0; gbc.gridy = i; gbc.weightx = 0;
+            det.add(etiq(filas[i][0]), gbc);
+            gbc.gridx = 1; gbc.weightx = 1;
+            det.add(val(filas[i][1]), gbc);
+        }
+
+        det.setBorder(new EmptyBorder(12, 14, 12, 14));
+        det.setMaximumSize(new Dimension(320, 150));
+        det.setAlignmentX(CENTER_ALIGNMENT);
+        body.add(det);
+        body.add(Box.createVerticalStrut(16));
+
+        JButton btnCerrar = botonSecundario("Cerrar");
+        btnCerrar.setMaximumSize(new Dimension(320, 40));
+        btnCerrar.setAlignmentX(CENTER_ALIGNMENT);
+
+        JDialog dlg = new JDialog(this, true);
+        dlg.setUndecorated(true);
+        dlg.getRootPane().setBorder(BorderFactory.createLineBorder(new Color(220, 215, 240)));
+        dlg.setContentPane(body);
+
+        btnCerrar.addActionListener(e -> dlg.dispose());
+        body.add(btnCerrar);
+
+        dlg.pack();
+        dlg.setLocationRelativeTo(this);
+        dlg.setVisible(true);
     }
 
     public void limpiarConfirmacion() {
@@ -678,11 +797,8 @@ public class VistaMain extends javax.swing.JFrame {
     }
     
     private void inicializarComboBoxes(){
-        
-        //COMBO FILTRO RESIDENTES
-        this.comboFiltroResidente.addItem("MUJERES");
-        this.comboFiltroResidente.addItem("HOMBRES");   
-        
+        this.comboFiltroResidente.addItem("Mujeres");
+        this.comboFiltroResidente.addItem("Hombres");
     }
 
     /**
@@ -800,27 +916,21 @@ public class VistaMain extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void comboFiltroResidenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboFiltroResidenteActionPerformed
-       String generoSeleccionado =  this.comboFiltroResidente.getSelectedItem().toString();
-       GeneroENUM genero;
-       if(generoSeleccionado.equals("MUJERES")){
-            control.filtrarResidente(GeneroENUM.MUJER);
-
-       }else if(generoSeleccionado.equals("HOMBRES")){
-            control.filtrarResidente(GeneroENUM.HOMBRE);
-       }else{
-            control.cargarResidentes();
+        if (control == null) return;
+        int idx = this.comboFiltroResidente.getSelectedIndex();
+        switch (idx) {
+            case 1 -> control.filtrarResidentesConHabitacion();
+            case 2 -> control.filtrarResidentesSinHabitacion();
+            case 3 -> control.filtrarResidente(GeneroENUM.MUJER);
+            case 4 -> control.filtrarResidente(GeneroENUM.HOMBRE);
+            default -> control.cargarResidentes();
         }
-       
     }//GEN-LAST:event_comboFiltroResidenteActionPerformed
 
     private void comboFiltroHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboFiltroHabitacionesActionPerformed
-
-        int pisoSeleccionado =  this.comboFiltroHabitaciones.getSelectedIndex();
-        if(pisoSeleccionado==0){
-            return;
-        }else{
-            control.filtrarHabitacion(pisoSeleccionado);
-        }
+        if (control == null) return;
+        int piso = this.comboFiltroHabitaciones.getSelectedIndex();
+        control.filtrarHabitacion(piso);
     }//GEN-LAST:event_comboFiltroHabitacionesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

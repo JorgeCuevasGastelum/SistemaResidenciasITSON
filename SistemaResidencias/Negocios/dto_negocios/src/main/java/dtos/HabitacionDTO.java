@@ -45,6 +45,16 @@ public class HabitacionDTO {
         this.ocupacionActual = ocupacionActual;
     }
 
+    public HabitacionDTO(Long id,
+            Integer piso,
+            Integer numero_habitacion,
+            Integer capacidad,
+            GeneroENUM genero,
+            Long ocupacionActual) {
+        this(id, piso, numero_habitacion, capacidad, genero);
+        this.ocupacionActual = ocupacionActual != null ? ocupacionActual.intValue() : 0;
+    }
+
     public Long getId() {
         return id;
     }

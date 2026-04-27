@@ -12,24 +12,12 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class AccesoDatos implements IAccesoDatos {
-    
+
     private EntityManager em = ManejadorConexiones.getEntityManager();
-    /**
-     * DAO para manejar los datos de los residentes en la base de datos
-     */
     private IResidentesDAO residentesDAO = new ResidentesDAO(em);
-    
-    /**
-     * DAO para manejar los datos de las habitaciones en la base de datos
-     */
     private IHabitacionesDAO habitacionesDAO = new HabitacionesDAO(em);
-    
-    /**
-     * DAO para manejar los datos de las asignaciones de habitaciones en la base de datos
-     */
     private IAsignacionesDAO asignacionesDAO = new AsignacionesDAO(em);
-    
-    
+
     @Override
     public List<ResidenteDTO> obtenerListadoResidentes() {
         return this.residentesDAO.obtenerListadoResidentesActivos();
@@ -41,36 +29,34 @@ public class AccesoDatos implements IAccesoDatos {
     }
 
     @Override
+    public List<ResidenteDTO> obtenerResultadoBusqueda(String textoComparable) {
+        return residentesDAO.buscarResidentesSimilares(textoComparable);
+    }
+
+    @Override
+    public List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero) {
+        return residentesDAO.buscarResidentesPorGenero(genero);
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerResidentesConHabitacion() {
+        return residentesDAO.obtenerResidentesConHabitacion();
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerResidentesSinHabitacion() {
+        return residentesDAO.obtenerResidentesSinHabitacion();
+    }
+
+    @Override
     public List<HabitacionDTO> obtenerHabitacionesDisponibles() {
         return this.habitacionesDAO.obtenerHabitacionesDisponibles();
     }
-    
+
     @Override
-    public List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId){
+    public List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId) {
         return this.habitacionesDAO.obtenerHabitacionesDisponiblesParaResidente(residenteId);
     }
-
-    @Override
-    public boolean asignarHabitacion(String residenteId, Integer numeroHabitacion) {
-        return this.asignacionesDAO.asignarHabitacion(residenteId, numeroHabitacion);
-    }
-    
-    @Override
-    public void crearDatosMock(){
-        residentesDAO.crearResidentesMock();
-        habitacionesDAO.crearHabitacionesMock();
-        asignacionesDAO.crearAsignacionesMock();
-    }
-
-    @Override
-    public void limpiarBaseDatos() {
-        residentesDAO.limpiarBaseDatos();
-    }
-
-    @Override
-    public List<ResidenteDTO> obtenerResultadoBusqueda(String textoComparable) {
-        return residentesDAO.buscarResidentesSimilares(textoComparable);
-    } 
 
     @Override
     public List<HabitacionDTO> obtenerHabitacionDisponiblesPorGenero(GeneroENUM genero) {
@@ -80,10 +66,27 @@ public class AccesoDatos implements IAccesoDatos {
     @Override
     public List<HabitacionDTO> obtenerHabitacionDisponiblesPorPiso(GeneroENUM genero, int piso) {
         return habitacionesDAO.obtenerHabitacionDisponiblesPorPiso(genero, piso);
-    } 
+    }
 
     @Override
-    public List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero) {
-        return residentesDAO.buscarResidentesPorGenero(genero);
+    public boolean asignarHabitacion(String residenteId, Integer numeroHabitacion) {
+        return this.asignacionesDAO.asignarHabitacion(residenteId, numeroHabitacion);
+    }
+
+    @Override
+    public boolean tieneAsignacionActiva(String residenteId) {
+        return asignacionesDAO.tieneAsignacionActiva(residenteId);
+    }
+
+    @Override
+    public void crearDatosMock() {
+        residentesDAO.crearResidentesMock();
+        habitacionesDAO.crearHabitacionesMock();
+        asignacionesDAO.crearAsignacionesMock();
+    }
+
+    @Override
+    public void limpiarBaseDatos() {
+        residentesDAO.limpiarBaseDatos();
     }
 }

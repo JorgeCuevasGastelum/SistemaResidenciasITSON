@@ -23,11 +23,15 @@ public class HabitacionCardPanel extends JPanel {
     private static final Color COLOR_TEXTO_BLANCO = Color.WHITE;
 
     private static final Color COLOR_DISPONIBLE_BG = new Color(75, 210, 100);
+    private static final Color COLOR_OCUPADA_BG = new Color(200, 60, 60);
+    private static final Color COLOR_FONDO_OCUPADA = new Color(252, 245, 245);
+    private static final Color COLOR_BORDE_OCUPADA = new Color(220, 180, 180);
 
     private static final Color COLOR_NUMERO = new Color(40, 45, 50);
     private static final Color COLOR_SECUNDARIO = new Color(80, 80, 90);
 
     private final HabitacionDTO habitacion;
+    private final boolean ocupada;
     private boolean seleccionado = false;
     private boolean hover = false;
 
@@ -35,8 +39,12 @@ public class HabitacionCardPanel extends JPanel {
 
     public HabitacionCardPanel(HabitacionDTO habitacion) {
         this.habitacion = habitacion;
+        this.ocupada = !habitacion.tieneCapacidad();
         construirUI();
         configurarInteracciones();
+        if (ocupada) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
     }
 
     private void construirUI() {
@@ -58,7 +66,7 @@ public class HabitacionCardPanel extends JPanel {
         lblNumero.setForeground(COLOR_NUMERO);
 
         topRow.add(lblNumero, BorderLayout.WEST);
-        topRow.add(crearBadgeDisponible(), BorderLayout.EAST);
+        topRow.add(ocupada ? crearBadgeOcupada() : crearBadgeDisponible(), BorderLayout.EAST);
 
         JPanel midRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         midRow.setOpaque(false);
@@ -176,14 +184,32 @@ public class HabitacionCardPanel extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(COLOR_DISPONIBLE_BG);
-
                 int radius = getHeight();
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
                 g2.dispose();
                 super.paintComponent(g);
             }
         };
+        badge.setForeground(COLOR_TEXTO_BLANCO);
+        badge.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        badge.setBorder(new EmptyBorder(3, 10, 3, 10));
+        badge.setOpaque(false);
+        return badge;
+    }
 
+    private JLabel crearBadgeOcupada() {
+        JLabel badge = new JLabel("Ocupada") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(COLOR_OCUPADA_BG);
+                int radius = getHeight();
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
         badge.setForeground(COLOR_TEXTO_BLANCO);
         badge.setFont(new Font("Segoe UI", Font.BOLD, 11));
         badge.setBorder(new EmptyBorder(3, 10, 3, 10));
@@ -195,8 +221,10 @@ public class HabitacionCardPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                hover = true;
-                repaint();
+                if (!ocupada) {
+                    hover = true;
+                    repaint();
+                }
             }
 
             @Override
@@ -207,7 +235,7 @@ public class HabitacionCardPanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (onSeleccion != null) {
+                if (!ocupada && onSeleccion != null) {
                     onSeleccion.run();
                 }
             }
@@ -219,9 +247,19 @@ public class HabitacionCardPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Color fondo = seleccionado ? COLOR_FONDO_SELECCIONADO : (hover ? COLOR_FONDO_HOVER : COLOR_FONDO_NORMAL);
-        Color borde = seleccionado ? COLOR_BORDE_SELECCIONADO : COLOR_BORDE_NORMAL;
-        float grosor = seleccionado ? 2f : 1f;
+        Color fondo;
+        Color borde;
+        float grosor;
+
+        if (ocupada) {
+            fondo = COLOR_FONDO_OCUPADA;
+            borde = COLOR_BORDE_OCUPADA;
+            grosor = 1f;
+        } else {
+            fondo = seleccionado ? COLOR_FONDO_SELECCIONADO : (hover ? COLOR_FONDO_HOVER : COLOR_FONDO_NORMAL);
+            borde = seleccionado ? COLOR_BORDE_SELECCIONADO : COLOR_BORDE_NORMAL;
+            grosor = seleccionado ? 2f : 1f;
+        }
 
         RoundRectangle2D rr = new RoundRectangle2D.Float(1, 1, getWidth() - 2, getHeight() - 2, 8, 8);
         g2.setColor(fondo);

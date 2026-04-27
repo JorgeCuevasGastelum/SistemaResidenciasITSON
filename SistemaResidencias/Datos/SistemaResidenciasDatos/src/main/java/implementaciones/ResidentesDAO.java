@@ -2,6 +2,7 @@ package implementaciones;
 
 import dtos.ResidenteDTO;
 import entidades.Residente;
+import enums.EstadoHabitacion;
 import enums.EstadoResidenteENUM;
 import enums.GeneroENUM;
 import interfaz.IResidentesDAO;
@@ -81,6 +82,39 @@ public class ResidentesDAO implements IResidentesDAO {
         }
 
         return resultados.get(0);
+    }
+
+    @Override
+    public void guardarResidente(Residente residente) {
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            entityManager.persist(residente);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void eliminarResidentePorId(String id) {
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            Residente residente = entityManager.find(Residente.class, id);
+            if (residente != null) {
+                entityManager.remove(residente);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -197,6 +231,79 @@ public class ResidentesDAO implements IResidentesDAO {
         }
     }
 
+    @Override
+    public List<ResidenteDTO> buscarResidentesSimilares(String textoComparable) {
+        String jpql = """
+            SELECT new dtos.ResidenteDTO(
+                r.id, r.nombre, r.apellido_paterno, r.apellido_materno,
+                r.genero, r.estado, r.carrera
+            )
+            FROM Residente r
+            WHERE (LOWER(r.nombre) LIKE :texto OR r.id LIKE :texto)
+            AND r.estado = :estado
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
+        query.setParameter("texto", "%" + textoComparable.toLowerCase() + "%");
+        query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero) {
+        String jpql = """
+            SELECT new dtos.ResidenteDTO(
+                r.id, r.nombre, r.apellido_paterno, r.apellido_materno,
+                r.genero, r.estado, r.carrera
+            )
+            FROM Residente r
+            WHERE r.genero = :genero
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
+        query.setParameter("genero", genero);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerResidentesConHabitacion() {
+        String jpql = """
+            SELECT new dtos.ResidenteDTO(
+                r.id, r.nombre, r.apellido_paterno, r.apellido_materno,
+                r.genero, r.estado, r.carrera
+            )
+            FROM Residente r
+            WHERE r.estado = :estado
+            AND EXISTS (
+                SELECT a FROM AsignacionHabitacion a
+                WHERE a.residente = r AND a.estadoHabitacion = :estadoActiva
+            )
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
+        query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
+        query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerResidentesSinHabitacion() {
+        String jpql = """
+            SELECT new dtos.ResidenteDTO(
+                r.id, r.nombre, r.apellido_paterno, r.apellido_materno,
+                r.genero, r.estado, r.carrera
+            )
+            FROM Residente r
+            WHERE r.estado = :estado
+            AND NOT EXISTS (
+                SELECT a FROM AsignacionHabitacion a
+                WHERE a.residente = r AND a.estadoHabitacion = :estadoActiva
+            )
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
+        query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
+        query.setParameter("estadoActiva", EstadoHabitacion.ACTIVA);
+        return query.getResultList();
+    }
+
+    @Override
     public void limpiarBaseDatos() {
 
         EntityTransaction tx = entityManager.getTransaction();
@@ -221,58 +328,5 @@ public class ResidentesDAO implements IResidentesDAO {
 
             e.printStackTrace();
         }
-    }
-    
-    //para el buscador
-    public List<ResidenteDTO> buscarResidentesSimilares(String textoComparable) {
-        String jpql = 
-        """
-            SELECT new dtos.ResidenteDTO(
-               r.id,
-                r.nombre,
-                r.apellido_paterno,
-                r.apellido_materno,
-                r.genero,
-                r.estado,
-                r.carrera
-            )
-            FROM Residente r
-            WHERE (LOWER(r.nombre) LIKE :texto 
-               OR r.id LIKE :texto)
-               AND r.estado = :estado
-        """;
-
-        TypedQuery<ResidenteDTO> query =
-                entityManager.createQuery(jpql, ResidenteDTO.class);
-
-        query.setParameter("texto", "%" + textoComparable.toLowerCase() + "%");
-        query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
-
-        return query.getResultList();
-    }
-
-
-        @Override
-    public List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero) {
-        
-        String jpql = """
-            SELECT new dtos.ResidenteDTO(
-                r.id,
-                r.nombre,
-                r.apellido_paterno,
-                r.apellido_materno,
-                r.genero,
-                r.estado,
-                r.carrera
-            )
-        FROM Residente r
-        WHERE r.genero = :genero 
-        """;
-
-        TypedQuery<ResidenteDTO> query
-                = entityManager.createQuery(jpql, ResidenteDTO.class);
-        
-        query.setParameter("genero", genero);
-        return query.getResultList();
     }
 }

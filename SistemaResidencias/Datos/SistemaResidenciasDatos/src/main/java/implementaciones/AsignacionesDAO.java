@@ -8,6 +8,7 @@ import interfaz.IAsignacionesDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import java.time.LocalDate;
+import java.util.List;
 
 public class AsignacionesDAO implements IAsignacionesDAO {
 
@@ -18,52 +19,83 @@ public class AsignacionesDAO implements IAsignacionesDAO {
     }
 
     @Override
-public boolean asignarHabitacion(String residenteId, Integer numeroHabitacion) {
+    public boolean asignarHabitacion(String residenteId, Integer numeroHabitacion) {
 
-    EntityTransaction tx = entityManager.getTransaction();
+        EntityTransaction tx = entityManager.getTransaction();
 
-    try {
+        try {
 
-        tx.begin();
+            tx.begin();
 
-        Residente residente = entityManager.find(Residente.class, residenteId);
+            Residente residente = entityManager.find(Residente.class, residenteId);
 
-        Habitacion habitacion = entityManager.createQuery(
-                "SELECT h FROM Habitacion h WHERE h.numero_habitacion = :numero",
-                Habitacion.class
-        )
-        .setParameter("numero", numeroHabitacion)
-        .getSingleResult();
+            if (residente == null) {
+                tx.rollback();
+                return false;
+            }
 
-        if (residente == null || habitacion == null) {
+            List<Habitacion> habitaciones = entityManager.createQuery(
+                    "SELECT h FROM Habitacion h WHERE h.numero_habitacion = :numero",
+                    Habitacion.class
+            )
+            .setParameter("numero", numeroHabitacion)
+            .getResultList();
+
+            if (habitaciones.isEmpty()) {
+                tx.rollback();
+                return false;
+            }
+
+            Habitacion habitacion = habitaciones.get(0);
+
+            List<AsignacionHabitacion> asignacionesActivas = entityManager.createQuery(
+                    "SELECT a FROM AsignacionHabitacion a WHERE a.residente.id = :residenteId AND a.estadoHabitacion = :estado",
+                    AsignacionHabitacion.class
+            )
+            .setParameter("residenteId", residenteId)
+            .setParameter("estado", EstadoHabitacion.ACTIVA)
+            .getResultList();
+
+            for (AsignacionHabitacion anterior : asignacionesActivas) {
+                anterior.setEstadoHabitacion(EstadoHabitacion.CANCELADA);
+                entityManager.merge(anterior);
+            }
+
+            AsignacionHabitacion asignacion = new AsignacionHabitacion();
+            asignacion.setResidente(residente);
+            asignacion.setHabitacion(habitacion);
+            asignacion.setFechaInicio(LocalDate.now());
+            asignacion.setFechaFin(LocalDate.now().plusMonths(6));
+            asignacion.setCicloLectivo("2025-1");
+            asignacion.setEstadoHabitacion(EstadoHabitacion.ACTIVA);
+
+            entityManager.persist(asignacion);
+
+            tx.commit();
+
+            return true;
+
+        } catch (Exception e) {
+
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+
+            e.printStackTrace();
             return false;
         }
-
-        AsignacionHabitacion asignacion = new AsignacionHabitacion();
-
-        asignacion.setResidente(residente);
-        asignacion.setHabitacion(habitacion);
-        asignacion.setFechaInicio(LocalDate.now());
-        asignacion.setFechaFin(LocalDate.now().plusMonths(6));
-        asignacion.setCicloLectivo("2025-1");
-        asignacion.setEstadoHabitacion(EstadoHabitacion.ACTIVA);
-
-        entityManager.persist(asignacion);
-
-        tx.commit();
-
-        return true;
-
-    } catch (Exception e) {
-
-        if (tx.isActive()) {
-            tx.rollback();
-        }
-
-        e.printStackTrace();
-        return false;
     }
-}
+
+    @Override
+    public boolean tieneAsignacionActiva(String residenteId) {
+        Long count = entityManager.createQuery(
+                "SELECT COUNT(a) FROM AsignacionHabitacion a WHERE a.residente.id = :id AND a.estadoHabitacion = :estado",
+                Long.class)
+                .setParameter("id", residenteId)
+                .setParameter("estado", EstadoHabitacion.ACTIVA)
+                .getSingleResult();
+        return count > 0;
+    }
 
     public void crearAsignacionesMock() {
 

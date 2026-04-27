@@ -31,6 +31,7 @@ public class ResidenteCardPanel extends JPanel {
     private boolean hover = false;
 
     private Runnable onSeleccion;
+    private Runnable onVistaPrevia;
 
     public ResidenteCardPanel(ResidenteDTO residente) {
         this.residente = residente;
@@ -70,6 +71,13 @@ public class ResidenteCardPanel extends JPanel {
         lblVista.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblVista.setForeground(COLOR_LINK);
         lblVista.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        lblVista.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                e.consume();
+                if (onVistaPrevia != null) onVistaPrevia.run();
+            }
+        });
 
         java.net.URL urlIcono = getClass().getResource("/OjoIcon.png");
 
@@ -209,5 +217,9 @@ public class ResidenteCardPanel extends JPanel {
 
     public void setOnSeleccion(Runnable callback) {
         this.onSeleccion = callback;
+    }
+
+    public void setOnVistaPrevia(Runnable callback) {
+        this.onVistaPrevia = callback;
     }
 }

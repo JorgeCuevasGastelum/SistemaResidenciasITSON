@@ -1,5 +1,6 @@
 package administradorAsignaciones;
 
 public interface IAdministradorAsignaciones {
-   boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
+    boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
+    boolean tieneAsignacionActiva(String residenteId);
 }

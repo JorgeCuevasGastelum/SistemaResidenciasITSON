@@ -9,13 +9,6 @@ import enums.GeneroENUM;
 import java.util.List;
 import presentacion.vistas.VistaMain;
 
-/**
- * Controlador de la pantalla "Asignar Habitaciones".
- *
- * Responsabilidades: - Mediar entre la vista y los subsistemas de negocio. -
- * Las vistas NO se llaman entre sí; todo pasa por aquí. - Mantiene el estado de
- * selección actual.
- */
 public class AsignarHabitacionesControl {
 
     private final IAdministradorResidentes adminResidentes;
@@ -44,6 +37,29 @@ public class AsignarHabitacionesControl {
         vista.mostrarResidentes(residentes);
     }
 
+    public void filtrarResidentesConHabitacion() {
+        List<ResidenteDTO> residentes = adminResidentes.obtenerResidentesConHabitacion();
+        vista.mostrarResidentes(residentes);
+    }
+
+    public void filtrarResidentesSinHabitacion() {
+        List<ResidenteDTO> residentes = adminResidentes.obtenerResidentesSinHabitacion();
+        vista.mostrarResidentes(residentes);
+    }
+
+    public void filtrarHabitacion(int piso) {
+        if (residenteSeleccionado == null) return;
+        List<HabitacionDTO> habitaciones;
+        if (piso == 0) {
+            habitaciones = adminHabitaciones.obtenerHabitacionDisponiblesParaResidente(
+                    residenteSeleccionado.getId());
+        } else {
+            habitaciones = adminHabitaciones.obtenerHabitacionDisponiblesPorPiso(
+                    residenteSeleccionado.getGenero(), piso);
+        }
+        vista.mostrarHabitaciones(habitaciones);
+    }
+
     public void seleccionarResidente(ResidenteDTO residente) {
         this.residenteSeleccionado = residente;
         this.habitacionSeleccionada = null;
@@ -54,6 +70,8 @@ public class AsignarHabitacionesControl {
                 = adminHabitaciones.obtenerHabitacionDisponiblesParaResidente(residente.getId());
         vista.mostrarHabitaciones(habitaciones);
 
+        boolean esReasignacion = adminAsignaciones.tieneAsignacionActiva(residente.getId());
+        vista.actualizarEstadoReasignacion(esReasignacion);
         vista.limpiarConfirmacion();
     }
     
@@ -62,22 +80,18 @@ public class AsignarHabitacionesControl {
            vista.mostrarResidentes(residentes);         
     }
     
-    public void filtrarHabitacion(int piso){
-        ResidenteDTO residenteSeleccionado = this.getResidenteSeleccionado();
-        GeneroENUM genero = residenteSeleccionado.getGenero();
-        List<HabitacionDTO> habitaciones = adminHabitaciones.obtenerHabitacionDisponiblesPorPiso(genero, piso);
-        vista.mostrarHabitaciones(habitaciones);
-    }
-
     public void seleccionarHabitacion(HabitacionDTO habitacion) {
-        if (residenteSeleccionado == null) {
+        if (residenteSeleccionado == null || !habitacion.tieneCapacidad()) {
             return;
         }
 
         this.habitacionSeleccionada = habitacion;
 
+        boolean esReasignacion = adminAsignaciones.tieneAsignacionActiva(
+                residenteSeleccionado.getId());
+
         vista.marcarHabitacionSeleccionada(habitacion);
-        vista.mostrarConfirmacion(residenteSeleccionado, habitacion);
+        vista.mostrarConfirmacion(residenteSeleccionado, habitacion, esReasignacion);
     }
 
     public void confirmarAsignacion() {
@@ -103,6 +117,10 @@ public class AsignarHabitacionesControl {
         habitacionSeleccionada = null;
         cargarResidentes();
         vista.limpiarTodo();
+    }
+
+    public ResidenteDTO obtenerResidenteDetalle(String id) {
+        return adminResidentes.obtenerResidentePorId(id);
     }
 
     public ResidenteDTO getResidenteSeleccionado() {

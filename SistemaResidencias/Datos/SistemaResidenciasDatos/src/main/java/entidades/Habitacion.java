@@ -17,6 +17,9 @@ public class Habitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = true)
+    private Integer piso;
+
     @Column(nullable = false, unique = true)
     private Integer numero_habitacion;
 
@@ -27,8 +30,6 @@ public class Habitacion {
     @Enumerated(EnumType.STRING)
     private GeneroENUM genero;
     
-    @Column(nullable = false)
-    private int piso;
 
     public Habitacion() {
     }
@@ -41,12 +42,25 @@ public class Habitacion {
         this.piso=piso;
     }
 
+    public Habitacion(Long id, Integer piso, Integer numero_habitacion, Integer capacidad, GeneroENUM genero) {
+        this(id, numero_habitacion, capacidad, genero);
+        this.piso = piso;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getPiso() {
+        return piso;
+    }
+
+    public void setPiso(Integer piso) {
+        this.piso = piso;
     }
 
     public Integer getNumero_habitacion() {
@@ -71,14 +85,6 @@ public class Habitacion {
 
     public void setGenero(GeneroENUM genero) {
         this.genero = genero;
-    }
-
-    public int getPiso() {
-        return piso;
-    }
-
-    public void setPiso(int piso) {
-        this.piso = piso;
     }
 
     @Override

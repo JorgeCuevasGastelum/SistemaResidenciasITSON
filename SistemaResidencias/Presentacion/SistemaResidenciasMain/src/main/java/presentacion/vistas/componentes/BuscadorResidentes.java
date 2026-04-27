@@ -4,6 +4,7 @@ import dtos.ResidenteDTO;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
@@ -24,12 +25,12 @@ import presentacion.control.AsignarHabitacionesControl;
 public class BuscadorResidentes extends javax.swing.JPanel {
     
     String PLACEHOLDER_TEXT = "Ingresa un nombre o ID";
-    
-    //modelo donde almacenamos la data
+
     DefaultListModel<String> listModel = new DefaultListModel<>();
     ResidenteBO residenteBO = ResidenteBO.getInstance();
     private Timer timer;
     private AsignarHabitacionesControl control;
+    private Consumer<List<ResidenteDTO>> onResultados;
 
 
 
@@ -130,35 +131,31 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 
             @Override
             protected void done() {
-                    try {
-                        List<ResidenteDTO> lista = get();
-                        listModel.clear();
+                try {
+                    List<ResidenteDTO> lista = get();
 
-                        if (lista.isEmpty()) {
-                            mostrarMensaje("No se encontraron resultados");
-                            return;
-                        }
+                    if (onResultados != null) {
+                        onResultados.accept(lista);
+                        return;
+                    }
 
-                        for (ResidenteDTO residente : lista) {
-                            String nombre = residente.getNombre() + " "
-                                    + residente.getApellido_paterno() + " "
-                                    + residente.getApellido_materno();
+                    listModel.clear();
+                    if (lista.isEmpty()) {
+                        mostrarMensaje("No se encontraron resultados");
+                        return;
+                    }
+                    for (ResidenteDTO residente : lista) {
+                        listModel.addElement(residente.getNombre() + " "
+                                + residente.getApellido_paterno() + " "
+                                + residente.getApellido_materno());
+                    }
+                    popupMenu.setPreferredSize(new Dimension(buscadorResidentesInput.getWidth(), 200));
+                    popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
 
-                            listModel.addElement(nombre);
-                        }
-
-                        popupMenu.setPreferredSize(new Dimension(
-                            buscadorResidentesInput.getWidth(),
-                            200));
-
-                        popupMenu.show(buscadorResidentesInput, 0, buscadorResidentesInput.getHeight());
-
-                    } catch (Exception e) {
-                        if(fintalTexto.equals(PLACEHOLDER_TEXT)){
-                            popupMenu.setVisible(false);
-                        }else{
-                            mostrarMensaje("Ha ocurrido un error");
-                        }
+                } catch (Exception e) {
+                    if (!fintalTexto.equals(PLACEHOLDER_TEXT) && onResultados == null) {
+                        mostrarMensaje("Ha ocurrido un error");
+                    }
                 }
             }
         }.execute();
@@ -199,7 +196,7 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 
         buscadorResidentesInput.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200), 1, true),
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(175, 160, 215), 1, true),
             javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         buscadorResidentesInput.setCaretColor(new java.awt.Color(0, 102, 204));
@@ -217,7 +214,7 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 
             public void focusLost(java.awt.event.FocusEvent evt) {
                 buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200), 0, true),
+                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(175, 160, 215), 1, true),
                     javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
                 ));
                 buscadorResidentesInput.setText(PLACEHOLDER_TEXT);
@@ -247,6 +244,10 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 }
 
 
+
+    public void setOnResultados(Consumer<List<ResidenteDTO>> callback) {
+        this.onResultados = callback;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField buscadorResidentesInput;
