@@ -134,6 +134,7 @@ public class VistaMain extends javax.swing.JFrame {
         BuscadorResidentes buscador = new BuscadorResidentes(72, 23);
         buscador.setOnResultados(lista -> mostrarResidentes(lista));
         this.panelBuscador.add(buscador);
+        getContentPane().setComponentZOrder(panelBuscador, 0);
         estilizarComboBox(comboFiltroResidente,
                 new String[]{"Mostrar todos", "Con habitacion", "Sin habitacion"});
         estilizarComboBox(comboFiltroHabitaciones,

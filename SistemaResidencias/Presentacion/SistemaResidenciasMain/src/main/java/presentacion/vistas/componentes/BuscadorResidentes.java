@@ -193,46 +193,44 @@ public class BuscadorResidentes extends javax.swing.JPanel {
     
     
     private void aplicarEstilos() {
+        setOpaque(true);
+        setBackground(new java.awt.Color(250, 249, 255));
+        setBorder(javax.swing.BorderFactory.createLineBorder(
+                new java.awt.Color(175, 160, 215), 1));
 
         buscadorResidentesInput.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(175, 160, 215), 1, true),
-            javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
-        buscadorResidentesInput.setCaretColor(new java.awt.Color(0, 102, 204));
+        buscadorResidentesInput.setBackground(new java.awt.Color(250, 249, 255));
+        buscadorResidentesInput.setOpaque(false);
+        buscadorResidentesInput.setBorder(
+                javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        buscadorResidentesInput.setCaretColor(new java.awt.Color(55, 75, 190));
 
-        // focus
         buscadorResidentesInput.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 204), 1, true),
-                    javax.swing.BorderFactory.createEmptyBorder(7, 11, 7, 11)
-                ));
+                setBorder(javax.swing.BorderFactory.createLineBorder(
+                        new java.awt.Color(55, 75, 190), 2));
                 buscadorResidentesInput.setForeground(new java.awt.Color(40, 40, 40));
                 buscadorResidentesInput.setText("");
             }
 
             public void focusLost(java.awt.event.FocusEvent evt) {
-                buscadorResidentesInput.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(175, 160, 215), 1, true),
-                    javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12)
-                ));
+                setBorder(javax.swing.BorderFactory.createLineBorder(
+                        new java.awt.Color(175, 160, 215), 1));
                 buscadorResidentesInput.setText(PLACEHOLDER_TEXT);
-                buscadorResidentesInput.setForeground(new java.awt.Color(204, 204, 204));
+                buscadorResidentesInput.setForeground(new java.awt.Color(180, 170, 210));
             }
         });
 
-        // popup
+        // popup (solo se usa si no hay callback de resultados)
         popupMenu.setFocusable(false);
         popupMenu.setBackground(new java.awt.Color(250, 250, 250));
         popupMenu.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220,220,220), 1, true),
-            javax.swing.BorderFactory.createEmptyBorder(5,5,5,5)
+                javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 220, 220), 1, true),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
 
         searchResults.setBackground(java.awt.Color.WHITE);
 
-        //lista
         jList1.setModel(listModel);
         jList1.setBackground(java.awt.Color.WHITE);
         jList1.setFixedCellHeight(35);
@@ -241,7 +239,7 @@ public class BuscadorResidentes extends javax.swing.JPanel {
 
         jScrollPane1.setBorder(null);
         jScrollPane1.setVisible(true);
-}
+    }
 
 
 
