@@ -121,10 +121,13 @@ import administradorAsignaciones.AdministradorAsignaciones;
 import administradorAsignaciones.IAdministradorAsignaciones;
 import administradorHabitaciones.AdministradorHabitaciones;
 import administradorHabitaciones.IAdministradorHabitaciones;
+import administradorReferencias.AdministradorReferencias;
+import administradorReferencias.IAdministradorReferencias;
 import administradorResidentes.AdministradorResidentes;
 import administradorResidentes.IAdministradorResidentes;
 import javax.swing.SwingUtilities;
 import presentacion.control.AsignarHabitacionesControl;
+import presentacion.control.ReferenciasPagoControl;
 import presentacion.vistas.VistaMain;
 
 public class SistemaResidenciasMain {
@@ -134,6 +137,7 @@ public class SistemaResidenciasMain {
         IAdministradorResidentes   adminResidentes   = new AdministradorResidentes();
         IAdministradorHabitaciones adminHabitaciones = new AdministradorHabitaciones();
         IAdministradorAsignaciones adminAsignaciones = new AdministradorAsignaciones();
+        IAdministradorReferencias  adminReferencias  = new AdministradorReferencias();
 
         adminResidentes.crearDatosMock();
 
@@ -143,9 +147,12 @@ public class SistemaResidenciasMain {
 
             AsignarHabitacionesControl control = new AsignarHabitacionesControl(
                     adminResidentes, adminHabitaciones, adminAsignaciones);
-
             control.setVista(vista);
             vista.setControl(control);
+
+            ReferenciasPagoControl controlReferencias = new ReferenciasPagoControl(
+                    adminResidentes, adminAsignaciones, adminReferencias);
+            vista.setControlReferencias(controlReferencias);
 
             vista.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override

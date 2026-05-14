@@ -1,6 +1,8 @@
 package interfaz;
 
+import dtos.AsignacionHabitacionDTO;
 import dtos.HabitacionDTO;
+import dtos.ReferenciasPagoDTO;
 import dtos.ResidenteDTO;
 import enums.GeneroENUM;
 import java.util.List;
@@ -21,6 +23,9 @@ public interface IAccesoDatos {
 
     boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
     boolean tieneAsignacionActiva(String residenteId);
+    AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId);
+
+    Long guardarReferenciaPago(ReferenciasPagoDTO dto);
 
     void crearDatosMock();
     void limpiarBaseDatos();

@@ -1,14 +1,20 @@
 package implementaciones;
 
 import conexion.ManejadorConexiones;
+import dtos.AsignacionHabitacionDTO;
 import dtos.HabitacionDTO;
+import dtos.ReferenciasPagoDTO;
 import dtos.ResidenteDTO;
+import entidades.Residente;
+import entidades.ReferenciasPago;
 import enums.GeneroENUM;
 import interfaz.IAccesoDatos;
 import interfaz.IAsignacionesDAO;
 import interfaz.IHabitacionesDAO;
+import interfaz.IReferenciasPagoDAO;
 import interfaz.IResidentesDAO;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 
 public class AccesoDatos implements IAccesoDatos {
@@ -17,6 +23,7 @@ public class AccesoDatos implements IAccesoDatos {
     private IResidentesDAO residentesDAO = new ResidentesDAO(em);
     private IHabitacionesDAO habitacionesDAO = new HabitacionesDAO(em);
     private IAsignacionesDAO asignacionesDAO = new AsignacionesDAO(em);
+    private IReferenciasPagoDAO referenciasDAO = new ReferenciasPagoDAO(em);
 
     @Override
     public List<ResidenteDTO> obtenerListadoResidentes() {
@@ -76,6 +83,29 @@ public class AccesoDatos implements IAccesoDatos {
     @Override
     public boolean tieneAsignacionActiva(String residenteId) {
         return asignacionesDAO.tieneAsignacionActiva(residenteId);
+    }
+
+    @Override
+    public AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId) {
+        return asignacionesDAO.obtenerAsignacionActiva(residenteId);
+    }
+
+    @Override
+    public Long guardarReferenciaPago(ReferenciasPagoDTO dto) {
+        Residente residente = em.find(Residente.class, dto.getIdResidente());
+        if (residente == null) return null;
+
+        ReferenciasPago entidad = new ReferenciasPago(
+                residente,
+                dto.getConcepto(),
+                dto.getReferenciaBancaria(),
+                dto.getPlanDePago(),
+                dto.getCicloLectivo(),
+                dto.getMonto(),
+                dto.getFechaLimite(),
+                LocalDate.now()
+        );
+        return referenciasDAO.guardarReferencia(entidad);
     }
 
     @Override

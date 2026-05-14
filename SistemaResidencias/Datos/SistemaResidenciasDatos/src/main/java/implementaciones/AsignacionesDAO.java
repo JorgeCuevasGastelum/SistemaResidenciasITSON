@@ -1,5 +1,6 @@
 package implementaciones;
 
+import dtos.AsignacionHabitacionDTO;
 import entidades.AsignacionHabitacion;
 import entidades.Habitacion;
 import entidades.Residente;
@@ -95,6 +96,31 @@ public class AsignacionesDAO implements IAsignacionesDAO {
                 .setParameter("estado", EstadoHabitacion.ACTIVA)
                 .getSingleResult();
         return count > 0;
+    }
+
+    @Override
+    public AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId) {
+        List<AsignacionHabitacion> result = entityManager.createQuery(
+                "SELECT a FROM AsignacionHabitacion a WHERE a.residente.id = :id AND a.estadoHabitacion = :estado",
+                AsignacionHabitacion.class)
+                .setParameter("id", residenteId)
+                .setParameter("estado", EstadoHabitacion.ACTIVA)
+                .getResultList();
+
+        if (result.isEmpty()) return null;
+
+        AsignacionHabitacion a = result.get(0);
+        return new AsignacionHabitacionDTO(
+                a.getId().intValue(),
+                a.getFechaInicio(),
+                a.getFechaFin(),
+                null,
+                a.getCicloLectivo(),
+                a.getHabitacion().getId(),
+                a.getHabitacion().getNumero_habitacion(),
+                a.getResidente().getId(),
+                a.getResidente().getNombre()
+        );
     }
 
     public void crearAsignacionesMock() {

@@ -134,7 +134,7 @@ public class ResidentesDAO implements IResidentesDAO {
             r1.setFechaNacimiento(LocalDate.of(2004, 10, 11));
             r1.setGenero(GeneroENUM.HOMBRE);
             r1.setDireccion("Calle 1");
-            r1.setCorreo("jorge.cuevas@itson.edu.mx");
+            r1.setCorreo("jorge.cuevas252274@potros.itson.edu.mx");
             r1.setTelefono("6441222916");
             r1.setEstado(EstadoResidenteENUM.ACTIVO);
             r1.setPermiso_vehicular(1);
@@ -312,6 +312,7 @@ public class ResidentesDAO implements IResidentesDAO {
 
             tx.begin();
 
+            entityManager.createQuery("DELETE FROM ReferenciasPago").executeUpdate();
             entityManager.createQuery("DELETE FROM AsignacionHabitacion").executeUpdate();
             entityManager.createQuery("DELETE FROM Habitacion").executeUpdate();
             entityManager.createQuery("DELETE FROM Residente").executeUpdate();

@@ -1,8 +1,10 @@
 package administradorAsignaciones;
 
+import dtos.AsignacionHabitacionDTO;
 import objetosnegocio.AsignarHabitacionBO;
 
-public class AdministradorAsignaciones implements IAdministradorAsignaciones{
+public class AdministradorAsignaciones implements IAdministradorAsignaciones {
+
     private AsignarHabitacionBO asignacionesBO = AsignarHabitacionBO.getInstance();
 
     @Override
@@ -13,5 +15,10 @@ public class AdministradorAsignaciones implements IAdministradorAsignaciones{
     @Override
     public boolean tieneAsignacionActiva(String residenteId) {
         return this.asignacionesBO.tieneAsignacionActiva(residenteId);
+    }
+
+    @Override
+    public AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId) {
+        return this.asignacionesBO.obtenerAsignacionActiva(residenteId);
     }
 }

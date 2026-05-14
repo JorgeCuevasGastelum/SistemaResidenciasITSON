@@ -2,17 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>itson</groupId>
-    <artifactId>Negocios</artifactId>
+    <artifactId>Infraestructura</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>SistemaResidenciasNegocio</module>
-        <module>objetos_negocio</module>
-        <module>dto_negocios</module>
-        <module>negocios_AdministradorHabitaciones</module>
-        <module>negocios_AdministradorResidentes</module>
-        <module>negocios_AdministradorAsignaciones</module>
-        <module>negocios_AdministradorReferencias</module>
+        <module>servicios_infraestructura</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

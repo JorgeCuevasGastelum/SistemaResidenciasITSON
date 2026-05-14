@@ -47,6 +47,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import presentacion.control.AsignarHabitacionesControl;
+import presentacion.control.ReferenciasPagoControl;
 import presentacion.vistas.componentes.BuscadorResidentes;
 import presentacion.vistas.componentes.HabitacionCardPanel;
 import presentacion.vistas.componentes.ResidenteCardPanel;
@@ -71,12 +72,19 @@ public class VistaMain extends javax.swing.JFrame {
     private static final Color FONDO_INPUT = new Color(250, 249, 255);
 
     private AsignarHabitacionesControl control;
+    private ReferenciasPagoControl controlReferencias;
     private SidebarPanel sidebar;
 
     private final List<ResidenteCardPanel> tarjetasResidentes = new ArrayList<>();
     private final List<HabitacionCardPanel> tarjetasHabitaciones = new ArrayList<>();
 
     private JPanel confirmacionPanel;
+    private PantallaReferenciaPago pantallaReferencia;
+
+    // Componentes del área de Asignar Habitaciones (para mostrar/ocultar)
+    private static final String PANTALLA_ASIGNAR = "asignar_habitaciones";
+    private static final String PANTALLA_REFERENCIA = "generar_referencia";
+    private String pantallaActual = PANTALLA_ASIGNAR;
 
     public VistaMain() {
         initComponents();
@@ -87,6 +95,11 @@ public class VistaMain extends javax.swing.JFrame {
 
     public void setControl(AsignarHabitacionesControl control) {
         this.control = control;
+    }
+
+    public void setControlReferencias(ReferenciasPagoControl controlReferencias) {
+        this.controlReferencias = controlReferencias;
+        pantallaReferencia.setControl(controlReferencias);
     }
 
     private void aplicarEstilos() {
@@ -105,7 +118,7 @@ public class VistaMain extends javax.swing.JFrame {
                 List.of(
                         new SidebarItem("Administrar Residentes", "administrar_residentes"),
                         new SidebarItem("Asignar Habitaciones", "asignar_habitaciones"),
-                        new SidebarItem("Generar referencia", "generar_referencia"),
+                        new SidebarItem("Generar referencia de pago", "generar_referencia"),
                         new SidebarItem("Gestionar áreas", "gestionar_areas"),
                         new SidebarItem("Mantenimiento", "mantenimiento"),
                         new SidebarItem("Gestionar habitaciones", "gestionar_habitaciones"),
@@ -118,14 +131,17 @@ public class VistaMain extends javax.swing.JFrame {
                 )
         );
 
-        sidebar.setOnNavegacion(clave -> {
-            if ("asignar_habitaciones".equals(clave)) {
-                control.cargarResidentes();
-            }
-        });
+        sidebar.setOnNavegacion(clave -> navegarA(clave));
         sidebar.setActivo("asignar_habitaciones");
 
         jPanelSideBar.add(sidebar, BorderLayout.CENTER);
+
+        // Panel de referencia de pago (cubierta del área de contenido)
+        pantallaReferencia = new PantallaReferenciaPago();
+        pantallaReferencia.setVisible(false);
+        getContentPane().add(pantallaReferencia,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, 1030, 832));
+        getContentPane().setComponentZOrder(pantallaReferencia, 0);
 
         jPanelSeleccion.setOpaque(false);
         jPanelSeleccion.setLayout(new BorderLayout());
@@ -188,6 +204,42 @@ public class VistaMain extends javax.swing.JFrame {
         confirmacionPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         jPanelSeleccion.add(confirmacionPanel, BorderLayout.CENTER);
         mostrarPlaceholderConfirmacion();
+    }
+
+    private void navegarA(String clave) {
+        if (pantallaActual.equals(clave)) return;
+
+        switch (clave) {
+            case PANTALLA_REFERENCIA -> {
+                mostrarContenidoAsignar(false);
+                pantallaReferencia.reiniciar();
+                pantallaReferencia.setVisible(true);
+                sidebar.setActivo(PANTALLA_REFERENCIA);
+                pantallaActual = PANTALLA_REFERENCIA;
+            }
+            case PANTALLA_ASIGNAR -> {
+                pantallaReferencia.setVisible(false);
+                mostrarContenidoAsignar(true);
+                sidebar.setActivo(PANTALLA_ASIGNAR);
+                pantallaActual = PANTALLA_ASIGNAR;
+                if (control != null) control.cargarResidentes();
+            }
+            default -> {
+                pantallaReferencia.setVisible(false);
+                mostrarContenidoAsignar(true);
+                sidebar.setActivo(clave);
+                pantallaActual = clave;
+            }
+        }
+    }
+
+    private void mostrarContenidoAsignar(boolean visible) {
+        comboFiltroHabitaciones.setVisible(visible);
+        comboFiltroResidente.setVisible(visible);
+        jScrollPaneHabitacion.setVisible(visible);
+        jScrollPaneResidentes.setVisible(visible);
+        panelBuscador.setVisible(visible);
+        jPanelSeleccion.setVisible(visible);
     }
 
     private void mostrarPlaceholderConfirmacion() {
