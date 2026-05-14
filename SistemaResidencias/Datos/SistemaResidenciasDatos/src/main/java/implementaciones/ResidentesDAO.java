@@ -3,6 +3,7 @@ package implementaciones;
 import dtos.ResidenteDTO;
 import entidades.Residente;
 import enums.EstadoHabitacion;
+import enums.EstadoPagoENUM;
 import enums.EstadoResidenteENUM;
 import enums.GeneroENUM;
 import interfaz.IResidentesDAO;
@@ -22,10 +23,6 @@ public class ResidentesDAO implements IResidentesDAO {
 
     @Override
     public List<ResidenteDTO> obtenerListadoResidentesActivos() {
-
-        //TEMPORAL NOMAS PARA PROBAR QUITEN EL COMENTARIO PARA QUE CREE REGISTROS
-        //insertarDatosMock();
-        //TEMPORAL NOMAS PARA PROBAR
         String jpql = """
             SELECT new dtos.ResidenteDTO(
                 r.id,
@@ -36,52 +33,74 @@ public class ResidentesDAO implements IResidentesDAO {
                 r.estado,
                 r.carrera
             )
-        FROM Residente r
-        WHERE r.estado = :estado
-        """;
-
-        TypedQuery<ResidenteDTO> query
-                = entityManager.createQuery(jpql, ResidenteDTO.class);
-
+            FROM Residente r
+            WHERE r.estado = :estado
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
         query.setParameter("estado", EstadoResidenteENUM.ACTIVO);
+        return query.getResultList();
+    }
 
+    @Override
+    public List<ResidenteDTO> obtenerTodosResidentes() {
+        String jpql = """
+            SELECT new dtos.ResidenteDTO(
+                r.id,
+                r.nombre,
+                r.apellido_paterno,
+                r.apellido_materno,
+                r.fechaNacimiento,
+                r.genero,
+                r.direccion,
+                r.correo,
+                r.telefono,
+                r.estado,
+                r.permiso_vehicular,
+                r.carrera
+            )
+            FROM Residente r
+            ORDER BY r.nombre ASC
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
         return query.getResultList();
     }
 
     @Override
     public ResidenteDTO obtenerResidentePorId(String id) {
-
         String jpql = """
-        SELECT new dtos.ResidenteDTO(
-            r.id,
-            r.nombre,
-            r.apellido_paterno,
-            r.apellido_materno,
-            r.fechaNacimiento,
-            r.genero,
-            r.direccion,
-            r.correo,
-            r.telefono,
-            r.estado,
-            r.permiso_vehicular,
-            r.carrera
-        )
-        FROM Residente r
-        WHERE r.id = :id
-    """;
-
-        TypedQuery<ResidenteDTO> query
-                = entityManager.createQuery(jpql, ResidenteDTO.class);
-
+            SELECT new dtos.ResidenteDTO(
+                r.id,
+                r.nombre,
+                r.apellido_paterno,
+                r.apellido_materno,
+                r.fechaNacimiento,
+                r.fechaIngreso,
+                r.genero,
+                r.direccion,
+                r.correo,
+                r.telefono,
+                r.estado,
+                r.permiso_vehicular,
+                r.carrera,
+                r.nombreAval,
+                r.parentescoAval,
+                r.telefonoAval,
+                r.correoAval,
+                r.direccionAval,
+                r.modeloVehiculo,
+                r.colorVehiculo,
+                r.placasVehiculo,
+                r.estadoPago,
+                r.ultimoPago,
+                r.adeudoPendiente
+            )
+            FROM Residente r
+            WHERE r.id = :id
+            """;
+        TypedQuery<ResidenteDTO> query = entityManager.createQuery(jpql, ResidenteDTO.class);
         query.setParameter("id", id);
-
         List<ResidenteDTO> resultados = query.getResultList();
-
-        if (resultados.isEmpty()) {
-            return null;
-        }
-
-        return resultados.get(0);
+        return resultados.isEmpty() ? null : resultados.get(0);
     }
 
     @Override
@@ -92,9 +111,37 @@ public class ResidentesDAO implements IResidentesDAO {
             entityManager.persist(residente);
             tx.commit();
         } catch (Exception e) {
-            if (tx.isActive()) {
-                tx.rollback();
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void actualizarResidente(Residente residente) {
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            entityManager.merge(residente);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void desactivarResidente(String id) {
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            Residente residente = entityManager.find(Residente.class, id);
+            if (residente != null) {
+                residente.setEstado(EstadoResidenteENUM.INACTIVO);
+                entityManager.merge(residente);
             }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
             e.printStackTrace();
         }
     }
@@ -110,123 +157,7 @@ public class ResidentesDAO implements IResidentesDAO {
             }
             tx.commit();
         } catch (Exception e) {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void crearResidentesMock() {
-
-        EntityTransaction tx = entityManager.getTransaction();
-
-        try {
-
-            tx.begin();
-
-            Residente r1 = new Residente();
-            r1.setId("00000252274");
-            r1.setNombre("Jorge");
-            r1.setApellido_paterno("Cuevas");
-            r1.setApellido_materno("Gastelum");
-            r1.setFechaNacimiento(LocalDate.of(2004, 10, 11));
-            r1.setGenero(GeneroENUM.HOMBRE);
-            r1.setDireccion("Calle 1");
-            r1.setCorreo("jorge.cuevas252274@potros.itson.edu.mx");
-            r1.setTelefono("6441222916");
-            r1.setEstado(EstadoResidenteENUM.ACTIVO);
-            r1.setPermiso_vehicular(1);
-            r1.setCarrera("Ing. Software");
-
-            Residente r2 = new Residente();
-            r2.setId("00000203020");
-            r2.setNombre("Joserra");
-            r2.setApellido_paterno("Reynaga");
-            r2.setApellido_materno("Nuñez");
-            r2.setFechaNacimiento(LocalDate.of(2005, 8, 21));
-            r2.setGenero(GeneroENUM.HOMBRE);
-            r2.setDireccion("Calle 2");
-            r2.setCorreo("joserra@itson.edu.mx");
-            r2.setTelefono("6445551234");
-            r2.setEstado(EstadoResidenteENUM.ACTIVO);
-            r2.setPermiso_vehicular(2);
-            r2.setCarrera("Ing. Software");
-
-            Residente r3 = new Residente();
-            r3.setId("00000252825");
-            r3.setNombre("Ari");
-            r3.setApellido_paterno("Montoya");
-            r3.setApellido_materno("Navarro");
-            r3.setFechaNacimiento(LocalDate.of(2001, 11, 3));
-            r3.setGenero(GeneroENUM.HOMBRE);
-            r3.setDireccion("Calle 3");
-            r3.setCorreo("ari@itson.edu.mx");
-            r3.setTelefono("6447778888");
-            r3.setEstado(EstadoResidenteENUM.ACTIVO);
-            r3.setPermiso_vehicular(3);
-            r3.setCarrera("Ing. Software");
-
-            Residente r4 = new Residente();
-            r4.setId("00000253017");
-            r4.setNombre("Abril");
-            r4.setApellido_paterno("Reyes");
-            r4.setApellido_materno("Islas");
-            r4.setFechaNacimiento(LocalDate.of(2005, 11, 3));
-            r4.setGenero(GeneroENUM.MUJER);
-            r4.setDireccion("Calle 4");
-            r4.setCorreo("abril@itson.edu.mx");
-            r4.setTelefono("6447722888");
-            r4.setEstado(EstadoResidenteENUM.ACTIVO);
-            r4.setPermiso_vehicular(4);
-            r4.setCarrera("Ing. Software");
-
-            Residente r5 = new Residente();
-            r5.setId("00000249718");
-            r5.setNombre("Melissa");
-            r5.setApellido_paterno("Chavez");
-            r5.setApellido_materno("Gutierrez");
-            r5.setFechaNacimiento(LocalDate.of(2004, 11, 3));
-            r5.setGenero(GeneroENUM.MUJER);
-            r5.setDireccion("Calle 5");
-            r5.setCorreo("melissa@itson.edu.mx");
-            r5.setTelefono("6443378888");
-            r5.setEstado(EstadoResidenteENUM.ACTIVO);
-            r5.setPermiso_vehicular(5);
-            r5.setCarrera("Ing. Software");
-
-            Residente r6 = new Residente();
-            r6.setId("00000250000");
-            r6.setNombre("Ivan");
-            r6.setApellido_paterno("Tapia");
-            r6.setApellido_materno("Moreno");
-            r6.setFechaNacimiento(LocalDate.of(1985, 11, 3));
-            r6.setGenero(GeneroENUM.HOMBRE);
-            r6.setDireccion("Calle 6");
-            r6.setCorreo("ivan.tapia@itson.edu.mx");
-            r6.setTelefono("6413378888");
-            r6.setEstado(EstadoResidenteENUM.INACTIVO);
-            r6.setPermiso_vehicular(6);
-            r6.setCarrera("Ing. Software");
-
-            entityManager.persist(r1);
-            entityManager.persist(r2);
-            entityManager.persist(r3);
-            entityManager.persist(r4);
-            entityManager.persist(r5);
-            entityManager.persist(r6);
-
-            tx.commit();
-
-            System.out.println("Residentes mock insertados correctamente");
-
-        } catch (Exception e) {
-
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-
+            if (tx.isActive()) tx.rollback();
             e.printStackTrace();
         }
     }
@@ -304,29 +235,129 @@ public class ResidentesDAO implements IResidentesDAO {
     }
 
     @Override
-    public void limpiarBaseDatos() {
-
+    public void crearResidentesMock() {
         EntityTransaction tx = entityManager.getTransaction();
-
         try {
-
             tx.begin();
 
+            Residente r1 = new Residente();
+            r1.setId("00000252274");
+            r1.setNombre("Jorge");
+            r1.setApellido_paterno("Cuevas");
+            r1.setApellido_materno("Gastelum");
+            r1.setFechaNacimiento(LocalDate.of(2004, 10, 11));
+            r1.setGenero(GeneroENUM.HOMBRE);
+            r1.setDireccion("Calle 1");
+            r1.setCorreo("jorge.cuevas252274@potros.itson.edu.mx");
+            r1.setTelefono("6441222916");
+            r1.setEstado(EstadoResidenteENUM.ACTIVO);
+            r1.setPermiso_vehicular(1);
+            r1.setCarrera("Ing. Software");
+            r1.setEstadoPago(EstadoPagoENUM.AL_CORRIENTE);
+
+            Residente r2 = new Residente();
+            r2.setId("00000203020");
+            r2.setNombre("Joserra");
+            r2.setApellido_paterno("Reynaga");
+            r2.setApellido_materno("Nuñez");
+            r2.setFechaNacimiento(LocalDate.of(2005, 8, 21));
+            r2.setGenero(GeneroENUM.HOMBRE);
+            r2.setDireccion("Calle 2");
+            r2.setCorreo("joserra@itson.edu.mx");
+            r2.setTelefono("6445551234");
+            r2.setEstado(EstadoResidenteENUM.ACTIVO);
+            r2.setPermiso_vehicular(2);
+            r2.setCarrera("Ing. Software");
+            r2.setEstadoPago(EstadoPagoENUM.AL_CORRIENTE);
+
+            Residente r3 = new Residente();
+            r3.setId("00000252825");
+            r3.setNombre("Ari");
+            r3.setApellido_paterno("Montoya");
+            r3.setApellido_materno("Navarro");
+            r3.setFechaNacimiento(LocalDate.of(2001, 11, 3));
+            r3.setGenero(GeneroENUM.HOMBRE);
+            r3.setDireccion("Calle 3");
+            r3.setCorreo("ari@itson.edu.mx");
+            r3.setTelefono("6447778888");
+            r3.setEstado(EstadoResidenteENUM.ACTIVO);
+            r3.setPermiso_vehicular(3);
+            r3.setCarrera("Ing. Software");
+            r3.setEstadoPago(EstadoPagoENUM.CON_DEUDA);
+
+            Residente r4 = new Residente();
+            r4.setId("00000253017");
+            r4.setNombre("Abril");
+            r4.setApellido_paterno("Reyes");
+            r4.setApellido_materno("Islas");
+            r4.setFechaNacimiento(LocalDate.of(2005, 11, 3));
+            r4.setGenero(GeneroENUM.MUJER);
+            r4.setDireccion("Calle 4");
+            r4.setCorreo("abril@itson.edu.mx");
+            r4.setTelefono("6447722888");
+            r4.setEstado(EstadoResidenteENUM.ACTIVO);
+            r4.setPermiso_vehicular(4);
+            r4.setCarrera("Ing. Software");
+            r4.setEstadoPago(EstadoPagoENUM.AL_CORRIENTE);
+
+            Residente r5 = new Residente();
+            r5.setId("00000249718");
+            r5.setNombre("Melissa");
+            r5.setApellido_paterno("Chavez");
+            r5.setApellido_materno("Gutierrez");
+            r5.setFechaNacimiento(LocalDate.of(2004, 11, 3));
+            r5.setGenero(GeneroENUM.MUJER);
+            r5.setDireccion("Calle 5");
+            r5.setCorreo("melissa@itson.edu.mx");
+            r5.setTelefono("6443378888");
+            r5.setEstado(EstadoResidenteENUM.ACTIVO);
+            r5.setPermiso_vehicular(5);
+            r5.setCarrera("Ing. Software");
+            r5.setEstadoPago(EstadoPagoENUM.MOROSO);
+
+            Residente r6 = new Residente();
+            r6.setId("00000250000");
+            r6.setNombre("Ivan");
+            r6.setApellido_paterno("Tapia");
+            r6.setApellido_materno("Moreno");
+            r6.setFechaNacimiento(LocalDate.of(1985, 11, 3));
+            r6.setGenero(GeneroENUM.HOMBRE);
+            r6.setDireccion("Calle 6");
+            r6.setCorreo("ivan.tapia@itson.edu.mx");
+            r6.setTelefono("6413378888");
+            r6.setEstado(EstadoResidenteENUM.INACTIVO);
+            r6.setPermiso_vehicular(6);
+            r6.setCarrera("Ing. Software");
+            r6.setEstadoPago(EstadoPagoENUM.CON_DEUDA);
+
+            entityManager.persist(r1);
+            entityManager.persist(r2);
+            entityManager.persist(r3);
+            entityManager.persist(r4);
+            entityManager.persist(r5);
+            entityManager.persist(r6);
+
+            tx.commit();
+            System.out.println("Residentes mock insertados correctamente");
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void limpiarBaseDatos() {
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
             entityManager.createQuery("DELETE FROM ReferenciasPago").executeUpdate();
             entityManager.createQuery("DELETE FROM AsignacionHabitacion").executeUpdate();
             entityManager.createQuery("DELETE FROM Habitacion").executeUpdate();
             entityManager.createQuery("DELETE FROM Residente").executeUpdate();
-
             tx.commit();
-
             System.out.println("Base de datos limpiada correctamente");
-
         } catch (Exception e) {
-
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-
+            if (tx.isActive()) tx.rollback();
             e.printStackTrace();
         }
     }

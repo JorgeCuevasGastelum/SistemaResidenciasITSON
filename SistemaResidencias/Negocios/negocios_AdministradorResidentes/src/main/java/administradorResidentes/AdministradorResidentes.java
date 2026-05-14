@@ -25,6 +25,11 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     }
 
     @Override
+    public List<ResidenteDTO> obtenerTodosResidentes() {
+        return residenteBO.getTodosResidentes();
+    }
+
+    @Override
     public ResidenteDTO obtenerResidentePorId(String id) {
         return residenteBO.getResidentePorId(id);
     }
@@ -47,5 +52,20 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     @Override
     public List<ResidenteDTO> obtenerResidentesSinHabitacion() {
         return residenteBO.getResidentesSinHabitacion();
+    }
+
+    @Override
+    public void guardarResidente(ResidenteDTO dto) {
+        residenteBO.guardarResidente(dto);
+    }
+
+    @Override
+    public void actualizarResidente(ResidenteDTO dto) {
+        residenteBO.actualizarResidente(dto);
+    }
+
+    @Override
+    public void desactivarResidente(String id) {
+        residenteBO.desactivarResidente(id);
     }
 }

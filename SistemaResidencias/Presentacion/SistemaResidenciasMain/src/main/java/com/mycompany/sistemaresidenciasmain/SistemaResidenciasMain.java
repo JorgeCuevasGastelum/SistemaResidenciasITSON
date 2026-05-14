@@ -127,6 +127,7 @@ import administradorResidentes.AdministradorResidentes;
 import administradorResidentes.IAdministradorResidentes;
 import javax.swing.SwingUtilities;
 import presentacion.control.AsignarHabitacionesControl;
+import presentacion.control.GestionarResidentesControl;
 import presentacion.control.ReferenciasPagoControl;
 import presentacion.vistas.VistaMain;
 
@@ -153,6 +154,10 @@ public class SistemaResidenciasMain {
             ReferenciasPagoControl controlReferencias = new ReferenciasPagoControl(
                     adminResidentes, adminAsignaciones, adminReferencias);
             vista.setControlReferencias(controlReferencias);
+
+            GestionarResidentesControl controlGestionar = new GestionarResidentesControl(
+                    adminResidentes, adminAsignaciones);
+            vista.setControlGestionar(controlGestionar);
 
             vista.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override

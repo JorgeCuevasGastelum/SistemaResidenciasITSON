@@ -10,11 +10,16 @@ import java.util.List;
 public interface IAccesoDatos {
 
     List<ResidenteDTO> obtenerListadoResidentes();
+    List<ResidenteDTO> obtenerTodosResidentes();
     ResidenteDTO getResidentePorId(String id);
     List<ResidenteDTO> obtenerResultadoBusqueda(String textoComparable);
     List<ResidenteDTO> buscarResidentesPorGenero(GeneroENUM genero);
     List<ResidenteDTO> obtenerResidentesConHabitacion();
     List<ResidenteDTO> obtenerResidentesSinHabitacion();
+
+    void guardarResidente(ResidenteDTO dto);
+    void actualizarResidente(ResidenteDTO dto);
+    void desactivarResidente(String id);
 
     List<HabitacionDTO> obtenerHabitacionesDisponibles();
     List<HabitacionDTO> obtenerHabitacionesDisponiblesParaResidente(String residenteId);

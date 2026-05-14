@@ -47,6 +47,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import presentacion.control.AsignarHabitacionesControl;
+import presentacion.control.GestionarResidentesControl;
 import presentacion.control.ReferenciasPagoControl;
 import presentacion.vistas.componentes.BuscadorResidentes;
 import presentacion.vistas.componentes.HabitacionCardPanel;
@@ -73,6 +74,7 @@ public class VistaMain extends javax.swing.JFrame {
 
     private AsignarHabitacionesControl control;
     private ReferenciasPagoControl controlReferencias;
+    private GestionarResidentesControl controlGestionar;
     private SidebarPanel sidebar;
 
     private final List<ResidenteCardPanel> tarjetasResidentes = new ArrayList<>();
@@ -80,10 +82,12 @@ public class VistaMain extends javax.swing.JFrame {
 
     private JPanel confirmacionPanel;
     private PantallaReferenciaPago pantallaReferencia;
+    private PantallaGestionarResidentes pantallaGestionar;
 
-    // Componentes del área de Asignar Habitaciones (para mostrar/ocultar)
+    // Pantallas disponibles
     private static final String PANTALLA_ASIGNAR = "asignar_habitaciones";
     private static final String PANTALLA_REFERENCIA = "generar_referencia";
+    private static final String PANTALLA_GESTIONAR = "administrar_residentes";
     private String pantallaActual = PANTALLA_ASIGNAR;
 
     public VistaMain() {
@@ -100,6 +104,11 @@ public class VistaMain extends javax.swing.JFrame {
     public void setControlReferencias(ReferenciasPagoControl controlReferencias) {
         this.controlReferencias = controlReferencias;
         pantallaReferencia.setControl(controlReferencias);
+    }
+
+    public void setControlGestionar(GestionarResidentesControl controlGestionar) {
+        this.controlGestionar = controlGestionar;
+        pantallaGestionar.setControl(controlGestionar);
     }
 
     private void aplicarEstilos() {
@@ -142,6 +151,13 @@ public class VistaMain extends javax.swing.JFrame {
         getContentPane().add(pantallaReferencia,
                 new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, 1030, 832));
         getContentPane().setComponentZOrder(pantallaReferencia, 0);
+
+        // Panel de gestionar residentes
+        pantallaGestionar = new PantallaGestionarResidentes();
+        pantallaGestionar.setVisible(false);
+        getContentPane().add(pantallaGestionar,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, 1030, 832));
+        getContentPane().setComponentZOrder(pantallaGestionar, 0);
 
         jPanelSeleccion.setOpaque(false);
         jPanelSeleccion.setLayout(new BorderLayout());
@@ -211,26 +227,39 @@ public class VistaMain extends javax.swing.JFrame {
 
         switch (clave) {
             case PANTALLA_REFERENCIA -> {
-                mostrarContenidoAsignar(false);
+                ocultarTodasLasPantallas();
                 pantallaReferencia.reiniciar();
                 pantallaReferencia.setVisible(true);
                 sidebar.setActivo(PANTALLA_REFERENCIA);
                 pantallaActual = PANTALLA_REFERENCIA;
             }
+            case PANTALLA_GESTIONAR -> {
+                ocultarTodasLasPantallas();
+                pantallaGestionar.setVisible(true);
+                pantallaGestionar.reiniciar();
+                sidebar.setActivo(PANTALLA_GESTIONAR);
+                pantallaActual = PANTALLA_GESTIONAR;
+            }
             case PANTALLA_ASIGNAR -> {
-                pantallaReferencia.setVisible(false);
+                ocultarTodasLasPantallas();
                 mostrarContenidoAsignar(true);
                 sidebar.setActivo(PANTALLA_ASIGNAR);
                 pantallaActual = PANTALLA_ASIGNAR;
                 if (control != null) control.cargarResidentes();
             }
             default -> {
-                pantallaReferencia.setVisible(false);
+                ocultarTodasLasPantallas();
                 mostrarContenidoAsignar(true);
                 sidebar.setActivo(clave);
                 pantallaActual = clave;
             }
         }
+    }
+
+    private void ocultarTodasLasPantallas() {
+        pantallaReferencia.setVisible(false);
+        pantallaGestionar.setVisible(false);
+        mostrarContenidoAsignar(false);
     }
 
     private void mostrarContenidoAsignar(boolean visible) {

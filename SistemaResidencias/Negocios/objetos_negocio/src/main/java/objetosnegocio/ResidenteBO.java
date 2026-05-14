@@ -32,6 +32,11 @@ public class ResidenteBO {
         return accesoDatos.obtenerListadoResidentes();
     }
 
+    public List<ResidenteDTO> getTodosResidentes() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.obtenerTodosResidentes();
+    }
+
     public ResidenteDTO getResidentePorId(String id) {
         IAccesoDatos accesoDatos = new AccesoDatos();
         return accesoDatos.getResidentePorId(id);
@@ -55,5 +60,20 @@ public class ResidenteBO {
     public List<ResidenteDTO> getResidentesSinHabitacion() {
         IAccesoDatos accesoDatos = new AccesoDatos();
         return accesoDatos.obtenerResidentesSinHabitacion();
+    }
+
+    public void guardarResidente(ResidenteDTO dto) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        accesoDatos.guardarResidente(dto);
+    }
+
+    public void actualizarResidente(ResidenteDTO dto) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        accesoDatos.actualizarResidente(dto);
+    }
+
+    public void desactivarResidente(String id) {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        accesoDatos.desactivarResidente(id);
     }
 }

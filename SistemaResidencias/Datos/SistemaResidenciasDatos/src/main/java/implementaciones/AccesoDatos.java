@@ -7,6 +7,8 @@ import dtos.ReferenciasPagoDTO;
 import dtos.ResidenteDTO;
 import entidades.Residente;
 import entidades.ReferenciasPago;
+import enums.EstadoPagoENUM;
+import enums.EstadoResidenteENUM;
 import enums.GeneroENUM;
 import interfaz.IAccesoDatos;
 import interfaz.IAsignacionesDAO;
@@ -28,6 +30,11 @@ public class AccesoDatos implements IAccesoDatos {
     @Override
     public List<ResidenteDTO> obtenerListadoResidentes() {
         return this.residentesDAO.obtenerListadoResidentesActivos();
+    }
+
+    @Override
+    public List<ResidenteDTO> obtenerTodosResidentes() {
+        return this.residentesDAO.obtenerTodosResidentes();
     }
 
     @Override
@@ -53,6 +60,52 @@ public class AccesoDatos implements IAccesoDatos {
     @Override
     public List<ResidenteDTO> obtenerResidentesSinHabitacion() {
         return residentesDAO.obtenerResidentesSinHabitacion();
+    }
+
+    @Override
+    public void guardarResidente(ResidenteDTO dto) {
+        Residente entidad = dtoAEntidad(dto);
+        residentesDAO.guardarResidente(entidad);
+    }
+
+    @Override
+    public void actualizarResidente(ResidenteDTO dto) {
+        Residente entidad = dtoAEntidad(dto);
+        residentesDAO.actualizarResidente(entidad);
+    }
+
+    @Override
+    public void desactivarResidente(String id) {
+        residentesDAO.desactivarResidente(id);
+    }
+
+    private Residente dtoAEntidad(ResidenteDTO dto) {
+        Residente r = new Residente();
+        r.setId(dto.getId());
+        r.setNombre(dto.getNombre());
+        r.setApellido_paterno(dto.getApellido_paterno());
+        r.setApellido_materno(dto.getApellido_materno());
+        r.setFechaNacimiento(dto.getFechaNacimiento() != null ? dto.getFechaNacimiento() : LocalDate.now());
+        r.setFechaIngreso(dto.getFechaIngreso());
+        r.setGenero(dto.getGenero());
+        r.setDireccion(dto.getDireccion() != null ? dto.getDireccion() : "");
+        r.setCorreo(dto.getCorreo() != null ? dto.getCorreo() : "");
+        r.setTelefono(dto.getTelefono() != null ? dto.getTelefono() : "");
+        r.setEstado(dto.getEstado() != null ? dto.getEstado() : EstadoResidenteENUM.ACTIVO);
+        r.setPermiso_vehicular(dto.getPermiso_vehicular() != null ? dto.getPermiso_vehicular() : 0);
+        r.setCarrera(dto.getCarrera() != null ? dto.getCarrera() : "");
+        r.setNombreAval(dto.getNombreAval());
+        r.setParentescoAval(dto.getParentescoAval());
+        r.setTelefonoAval(dto.getTelefonoAval());
+        r.setCorreoAval(dto.getCorreoAval());
+        r.setDireccionAval(dto.getDireccionAval());
+        r.setModeloVehiculo(dto.getModeloVehiculo());
+        r.setColorVehiculo(dto.getColorVehiculo());
+        r.setPlacasVehiculo(dto.getPlacasVehiculo());
+        r.setEstadoPago(dto.getEstadoPago() != null ? dto.getEstadoPago() : EstadoPagoENUM.AL_CORRIENTE);
+        r.setUltimoPago(dto.getUltimoPago());
+        r.setAdeudoPendiente(dto.getAdeudoPendiente() != null ? dto.getAdeudoPendiente() : 0.0);
+        return r;
     }
 
     @Override
