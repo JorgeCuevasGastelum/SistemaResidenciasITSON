@@ -1,6 +1,8 @@
 package administradorAsignaciones;
 
 import dtos.AsignacionHabitacionDTO;
+import dtos.AsignacionReporteDTO;
+import java.util.List;
 import objetosnegocio.AsignarHabitacionBO;
 
 public class AdministradorAsignaciones implements IAdministradorAsignaciones {
@@ -20,5 +22,20 @@ public class AdministradorAsignaciones implements IAdministradorAsignaciones {
     @Override
     public AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId) {
         return this.asignacionesBO.obtenerAsignacionActiva(residenteId);
+    }
+
+    @Override
+    public List<AsignacionReporteDTO> obtenerListaAsignaciones() {
+        return this.asignacionesBO.obtenerListaAsignaciones();
+    }
+
+    @Override
+    public int contarHabitacionesOcupadas() {
+        return this.asignacionesBO.contarHabitacionesOcupadas();
+    }
+
+    @Override
+    public int contarResidentesAsignados() {
+        return this.asignacionesBO.contarResidentesAsignados();
     }
 }

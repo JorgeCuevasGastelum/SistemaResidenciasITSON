@@ -1,6 +1,8 @@
 package interfaz;
 
 import dtos.AsignacionHabitacionDTO;
+import dtos.AsignacionReporteDTO;
+import java.util.List;
 
 public interface IAsignacionesDAO {
 
@@ -8,4 +10,8 @@ public interface IAsignacionesDAO {
     boolean tieneAsignacionActiva(String residenteId);
     AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId);
     void crearAsignacionesMock();
+
+    List<AsignacionReporteDTO> obtenerListaAsignaciones();
+    int contarHabitacionesOcupadas();
+    int contarResidentesAsignados();
 }

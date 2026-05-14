@@ -2,6 +2,7 @@ package implementaciones;
 
 import conexion.ManejadorConexiones;
 import dtos.AsignacionHabitacionDTO;
+import dtos.AsignacionReporteDTO;
 import dtos.HabitacionDTO;
 import dtos.ReferenciasPagoDTO;
 import dtos.ResidenteDTO;
@@ -141,6 +142,21 @@ public class AccesoDatos implements IAccesoDatos {
     @Override
     public AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId) {
         return asignacionesDAO.obtenerAsignacionActiva(residenteId);
+    }
+
+    @Override
+    public List<AsignacionReporteDTO> obtenerListaAsignaciones() {
+        return asignacionesDAO.obtenerListaAsignaciones();
+    }
+
+    @Override
+    public int contarHabitacionesOcupadas() {
+        return asignacionesDAO.contarHabitacionesOcupadas();
+    }
+
+    @Override
+    public int contarResidentesAsignados() {
+        return asignacionesDAO.contarResidentesAsignados();
     }
 
     @Override

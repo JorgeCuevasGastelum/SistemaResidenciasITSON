@@ -1,6 +1,7 @@
 package interfaz;
 
 import dtos.AsignacionHabitacionDTO;
+import dtos.AsignacionReporteDTO;
 import dtos.HabitacionDTO;
 import dtos.ReferenciasPagoDTO;
 import dtos.ResidenteDTO;
@@ -29,6 +30,9 @@ public interface IAccesoDatos {
     boolean asignarHabitacion(String residenteId, Integer numeroHabitacion);
     boolean tieneAsignacionActiva(String residenteId);
     AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId);
+    List<AsignacionReporteDTO> obtenerListaAsignaciones();
+    int contarHabitacionesOcupadas();
+    int contarResidentesAsignados();
 
     Long guardarReferenciaPago(ReferenciasPagoDTO dto);
 

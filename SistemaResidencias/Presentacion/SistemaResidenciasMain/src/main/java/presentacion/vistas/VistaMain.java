@@ -48,6 +48,7 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import presentacion.control.AsignarHabitacionesControl;
 import presentacion.control.GestionarResidentesControl;
+import presentacion.control.ListaAsignacionControl;
 import presentacion.control.ReferenciasPagoControl;
 import presentacion.vistas.componentes.BuscadorResidentes;
 import presentacion.vistas.componentes.HabitacionCardPanel;
@@ -75,6 +76,7 @@ public class VistaMain extends javax.swing.JFrame {
     private AsignarHabitacionesControl control;
     private ReferenciasPagoControl controlReferencias;
     private GestionarResidentesControl controlGestionar;
+    private ListaAsignacionControl controlLista;
     private SidebarPanel sidebar;
 
     private final List<ResidenteCardPanel> tarjetasResidentes = new ArrayList<>();
@@ -83,11 +85,13 @@ public class VistaMain extends javax.swing.JFrame {
     private JPanel confirmacionPanel;
     private PantallaReferenciaPago pantallaReferencia;
     private PantallaGestionarResidentes pantallaGestionar;
+    private PantallaListaAsignacion pantallaLista;
 
     // Pantallas disponibles
-    private static final String PANTALLA_ASIGNAR = "asignar_habitaciones";
+    private static final String PANTALLA_ASIGNAR   = "asignar_habitaciones";
     private static final String PANTALLA_REFERENCIA = "generar_referencia";
-    private static final String PANTALLA_GESTIONAR = "administrar_residentes";
+    private static final String PANTALLA_GESTIONAR  = "administrar_residentes";
+    private static final String PANTALLA_LISTA      = "generar_listas";
     private String pantallaActual = PANTALLA_ASIGNAR;
 
     public VistaMain() {
@@ -109,6 +113,11 @@ public class VistaMain extends javax.swing.JFrame {
     public void setControlGestionar(GestionarResidentesControl controlGestionar) {
         this.controlGestionar = controlGestionar;
         pantallaGestionar.setControl(controlGestionar);
+    }
+
+    public void setControlLista(ListaAsignacionControl controlLista) {
+        this.controlLista = controlLista;
+        pantallaLista.setControl(controlLista);
     }
 
     private void aplicarEstilos() {
@@ -158,6 +167,13 @@ public class VistaMain extends javax.swing.JFrame {
         getContentPane().add(pantallaGestionar,
                 new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, 1030, 832));
         getContentPane().setComponentZOrder(pantallaGestionar, 0);
+
+        // Panel de lista de asignación
+        pantallaLista = new PantallaListaAsignacion();
+        pantallaLista.setVisible(false);
+        getContentPane().add(pantallaLista,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, 1030, 832));
+        getContentPane().setComponentZOrder(pantallaLista, 0);
 
         jPanelSeleccion.setOpaque(false);
         jPanelSeleccion.setLayout(new BorderLayout());
@@ -240,6 +256,13 @@ public class VistaMain extends javax.swing.JFrame {
                 sidebar.setActivo(PANTALLA_GESTIONAR);
                 pantallaActual = PANTALLA_GESTIONAR;
             }
+            case PANTALLA_LISTA -> {
+                ocultarTodasLasPantallas();
+                pantallaLista.setVisible(true);
+                pantallaLista.reiniciar();
+                sidebar.setActivo(PANTALLA_LISTA);
+                pantallaActual = PANTALLA_LISTA;
+            }
             case PANTALLA_ASIGNAR -> {
                 ocultarTodasLasPantallas();
                 mostrarContenidoAsignar(true);
@@ -259,6 +282,7 @@ public class VistaMain extends javax.swing.JFrame {
     private void ocultarTodasLasPantallas() {
         pantallaReferencia.setVisible(false);
         pantallaGestionar.setVisible(false);
+        pantallaLista.setVisible(false);
         mostrarContenidoAsignar(false);
     }
 

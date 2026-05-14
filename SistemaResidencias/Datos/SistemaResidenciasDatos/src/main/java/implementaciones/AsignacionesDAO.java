@@ -1,13 +1,16 @@
 package implementaciones;
 
 import dtos.AsignacionHabitacionDTO;
+import dtos.AsignacionReporteDTO;
 import entidades.AsignacionHabitacion;
 import entidades.Habitacion;
 import entidades.Residente;
 import enums.EstadoHabitacion;
+import enums.EstadoResidenteENUM;
 import interfaz.IAsignacionesDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -123,6 +126,56 @@ public class AsignacionesDAO implements IAsignacionesDAO {
         );
     }
 
+    @Override
+    public List<AsignacionReporteDTO> obtenerListaAsignaciones() {
+        String jpql = """
+            SELECT new dtos.AsignacionReporteDTO(
+                a.habitacion.numero_habitacion,
+                a.habitacion.piso,
+                a.residente.nombre,
+                a.residente.apellido_paterno,
+                a.residente.apellido_materno,
+                a.residente.carrera,
+                a.habitacion.genero,
+                a.residente.estadoPago,
+                a.residente.fechaIngreso,
+                a.cicloLectivo
+            )
+            FROM AsignacionHabitacion a
+            WHERE a.estadoHabitacion = :estado
+              AND a.residente.estado = :estadoResidente
+            ORDER BY a.habitacion.numero_habitacion ASC
+            """;
+        TypedQuery<AsignacionReporteDTO> query = entityManager.createQuery(jpql, AsignacionReporteDTO.class);
+        query.setParameter("estado", EstadoHabitacion.ACTIVA);
+        query.setParameter("estadoResidente", EstadoResidenteENUM.ACTIVO);
+        return query.getResultList();
+    }
+
+    @Override
+    public int contarHabitacionesOcupadas() {
+        Long count = entityManager.createQuery(
+                "SELECT COUNT(DISTINCT a.habitacion.id) FROM AsignacionHabitacion a"
+                + " WHERE a.estadoHabitacion = :estado AND a.residente.estado = :estadoResidente",
+                Long.class)
+                .setParameter("estado", EstadoHabitacion.ACTIVA)
+                .setParameter("estadoResidente", EstadoResidenteENUM.ACTIVO)
+                .getSingleResult();
+        return count != null ? count.intValue() : 0;
+    }
+
+    @Override
+    public int contarResidentesAsignados() {
+        Long count = entityManager.createQuery(
+                "SELECT COUNT(a) FROM AsignacionHabitacion a"
+                + " WHERE a.estadoHabitacion = :estado AND a.residente.estado = :estadoResidente",
+                Long.class)
+                .setParameter("estado", EstadoHabitacion.ACTIVA)
+                .setParameter("estadoResidente", EstadoResidenteENUM.ACTIVO)
+                .getSingleResult();
+        return count != null ? count.intValue() : 0;
+    }
+
     public void crearAsignacionesMock() {
 
         EntityTransaction tx = entityManager.getTransaction();
@@ -131,11 +184,11 @@ public class AsignacionesDAO implements IAsignacionesDAO {
 
             tx.begin();
 
-            Residente r1 = entityManager.find(Residente.class, "00000252274");
+            Residente r1 = entityManager.find(Residente.class, "00000252825");
             Residente r2 = entityManager.find(Residente.class, "00000203020");
 
             Habitacion h1 = entityManager.createQuery(
-                    "SELECT h FROM Habitacion h WHERE h.numero_habitacion = 101",
+                    "SELECT h FROM Habitacion h WHERE h.numero_habitacion = 1101",
                     Habitacion.class
             ).getSingleResult();
 

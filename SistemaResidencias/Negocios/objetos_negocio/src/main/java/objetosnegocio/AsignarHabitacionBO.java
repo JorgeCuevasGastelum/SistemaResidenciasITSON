@@ -1,8 +1,10 @@
 package objetosnegocio;
 
 import dtos.AsignacionHabitacionDTO;
+import dtos.AsignacionReporteDTO;
 import implementaciones.AccesoDatos;
 import interfaz.IAccesoDatos;
+import java.util.List;
 
 public class AsignarHabitacionBO {
 
@@ -28,5 +30,20 @@ public class AsignarHabitacionBO {
     public AsignacionHabitacionDTO obtenerAsignacionActiva(String residenteId) {
         IAccesoDatos accesoDatos = new AccesoDatos();
         return accesoDatos.obtenerAsignacionActiva(residenteId);
+    }
+
+    public List<AsignacionReporteDTO> obtenerListaAsignaciones() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.obtenerListaAsignaciones();
+    }
+
+    public int contarHabitacionesOcupadas() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.contarHabitacionesOcupadas();
+    }
+
+    public int contarResidentesAsignados() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.contarResidentesAsignados();
     }
 }
