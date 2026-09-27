@@ -34,14 +34,35 @@ public class Residente {
     @Enumerated(EnumType.STRING)
     private GeneroENUM genero;
 
+    // =========================================================
+    // DOMICILIO
+    // =========================================================
+
     @Column(length = 200, nullable = false)
     private String direccion;
+
+    @Column(length = 100, nullable = false)
+    private String ciudad;
+
+    @Column(length = 100, nullable = false)
+    private String estadoPais;
+
+    @Column(length = 100, nullable = false)
+    private String pais;
+
+    // =========================================================
+    // CONTACTO
+    // =========================================================
 
     @Column(length = 150, nullable = false)
     private String correo;
 
     @Column(length = 15, nullable = false)
     private String telefono;
+
+    // =========================================================
+    // ESTADO DEL RESIDENTE
+    // =========================================================
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -52,8 +73,17 @@ public class Residente {
 
     @Column(length = 100, nullable = false)
     private String carrera;
+    
+    @Column(length = 100, nullable = false)
+    private Boolean isDeportista;
+        
+    @Column(length = 100, nullable = false)
+    private Boolean isIntercambio;
 
-    // Aval / Fiador
+    // =========================================================
+    // AVAL / FIADOR
+    // =========================================================
+
     @Column(length = 150)
     private String nombreAval;
 
@@ -69,7 +99,10 @@ public class Residente {
     @Column(length = 250)
     private String direccionAval;
 
-    // Permiso Vehicular
+    // =========================================================
+    // VEHÍCULO
+    // =========================================================
+
     @Column(length = 100)
     private String modeloVehiculo;
 
@@ -79,7 +112,10 @@ public class Residente {
     @Column(length = 20)
     private String placasVehiculo;
 
-    // Plan de pago
+    // =========================================================
+    // PLAN DE PAGO
+    // =========================================================
+
     @Enumerated(EnumType.STRING)
     @Column
     private EstadoPagoENUM estadoPago;
@@ -90,12 +126,36 @@ public class Residente {
     @Column
     private Double adeudoPendiente;
 
+    // =========================================================
+    // CONSTRUCTORES
+    // =========================================================
+
     public Residente() {
     }
 
-    public Residente(String id, String nombre, String apellido_paterno, String apellido_materno,
-            LocalDate fechaNacimiento, GeneroENUM genero, String direccion, String correo,
-            String telefono, EstadoResidenteENUM estado, Integer permiso_vehicular, String carrera) {
+    /**
+     * Constructor básico.
+     */
+    public Residente(
+            String id,
+            String nombre,
+            String apellido_paterno,
+            String apellido_materno,
+            LocalDate fechaNacimiento,
+            GeneroENUM genero,
+            String direccion,
+            String ciudad,
+            String estadoPais,
+            String pais,
+            String correo,
+            String telefono,
+            EstadoResidenteENUM estado,
+            Integer permiso_vehicular,
+            String carrera, 
+            Boolean isDeportista,
+            Boolean isIntercambio
+    ) {
+
         this.id = id;
         this.nombre = nombre;
         this.apellido_paterno = apellido_paterno;
@@ -108,99 +168,381 @@ public class Residente {
         this.estado = estado;
         this.permiso_vehicular = permiso_vehicular;
         this.carrera = carrera;
+        this.isDeportista = isDeportista;
+        this.isIntercambio = isIntercambio;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    /**
+     * Constructor completo.
+     * @param id
+     * @param nombre
+     */
+    public Residente(
+            String id,
+            String nombre,
+            String apellido_paterno,
+            String apellido_materno,
+            LocalDate fechaNacimiento,
+            LocalDate fechaIngreso,
+            GeneroENUM genero,
+            String direccion,
+            String ciudad,
+            String estadoPais,
+            String pais,
+            String correo,
+            String telefono,
+            EstadoResidenteENUM estado,
+            Integer permiso_vehicular,
+            String carrera,
+            String nombreAval,
+            String parentescoAval,
+            String telefonoAval,
+            String correoAval,
+            String direccionAval,
+            String modeloVehiculo,
+            String colorVehiculo,
+            String placasVehiculo,
+            EstadoPagoENUM estadoPago,
+            LocalDate ultimoPago,
+            Double adeudoPendiente,
+            Boolean isDeportista,
+            Boolean isIntercambio
+    ) {
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido_paterno = apellido_paterno;
+        this.apellido_materno = apellido_materno;
+        this.fechaNacimiento = fechaNacimiento;
+        this.fechaIngreso = fechaIngreso;
+        this.genero = genero;
 
-    public String getApellido_paterno() { return apellido_paterno; }
-    public void setApellido_paterno(String apellido_paterno) { this.apellido_paterno = apellido_paterno; }
+        this.direccion = direccion;
+        this.ciudad = ciudad;
+        this.estadoPais = estadoPais;
+        this.pais = pais;
 
-    public String getApellido_materno() { return apellido_materno; }
-    public void setApellido_materno(String apellido_materno) { this.apellido_materno = apellido_materno; }
+        this.correo = correo;
+        this.telefono = telefono;
 
-    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+        this.estado = estado;
+        this.permiso_vehicular = permiso_vehicular;
+        this.carrera = carrera;
 
-    public LocalDate getFechaIngreso() { return fechaIngreso; }
-    public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+        this.nombreAval = nombreAval;
+        this.parentescoAval = parentescoAval;
+        this.telefonoAval = telefonoAval;
+        this.correoAval = correoAval;
+        this.direccionAval = direccionAval;
 
-    public GeneroENUM getGenero() { return genero; }
-    public void setGenero(GeneroENUM genero) { this.genero = genero; }
+        this.modeloVehiculo = modeloVehiculo;
+        this.colorVehiculo = colorVehiculo;
+        this.placasVehiculo = placasVehiculo;
 
-    public String getDireccion() { return direccion; }
-    public void setDireccion(String direccion) { this.direccion = direccion; }
+        this.estadoPago = estadoPago;
+        this.ultimoPago = ultimoPago;
+        this.adeudoPendiente = adeudoPendiente;
+        
+        this.isDeportista = isDeportista;
+        this.isIntercambio = isIntercambio;
+    }
 
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    // =========================================================
+    // GETTERS / SETTERS
+    // =========================================================
 
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getId() {
+        return id;
+    }
 
-    public EstadoResidenteENUM getEstado() { return estado; }
-    public void setEstado(EstadoResidenteENUM estado) { this.estado = estado; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public Integer getPermiso_vehicular() { return permiso_vehicular; }
-    public void setPermiso_vehicular(Integer permiso_vehicular) { this.permiso_vehicular = permiso_vehicular; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getCarrera() { return carrera; }
-    public void setCarrera(String carrera) { this.carrera = carrera; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getNombreAval() { return nombreAval; }
-    public void setNombreAval(String nombreAval) { this.nombreAval = nombreAval; }
+    public String getApellido_paterno() {
+        return apellido_paterno;
+    }
 
-    public String getParentescoAval() { return parentescoAval; }
-    public void setParentescoAval(String parentescoAval) { this.parentescoAval = parentescoAval; }
+    public void setApellido_paterno(String apellido_paterno) {
+        this.apellido_paterno = apellido_paterno;
+    }
 
-    public String getTelefonoAval() { return telefonoAval; }
-    public void setTelefonoAval(String telefonoAval) { this.telefonoAval = telefonoAval; }
+    public String getApellido_materno() {
+        return apellido_materno;
+    }
 
-    public String getCorreoAval() { return correoAval; }
-    public void setCorreoAval(String correoAval) { this.correoAval = correoAval; }
+    public void setApellido_materno(String apellido_materno) {
+        this.apellido_materno = apellido_materno;
+    }
 
-    public String getDireccionAval() { return direccionAval; }
-    public void setDireccionAval(String direccionAval) { this.direccionAval = direccionAval; }
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
 
-    public String getModeloVehiculo() { return modeloVehiculo; }
-    public void setModeloVehiculo(String modeloVehiculo) { this.modeloVehiculo = modeloVehiculo; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
 
-    public String getColorVehiculo() { return colorVehiculo; }
-    public void setColorVehiculo(String colorVehiculo) { this.colorVehiculo = colorVehiculo; }
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
+    }
 
-    public String getPlacasVehiculo() { return placasVehiculo; }
-    public void setPlacasVehiculo(String placasVehiculo) { this.placasVehiculo = placasVehiculo; }
+    public void setFechaIngreso(LocalDate fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
 
-    public EstadoPagoENUM getEstadoPago() { return estadoPago; }
-    public void setEstadoPago(EstadoPagoENUM estadoPago) { this.estadoPago = estadoPago; }
+    public GeneroENUM getGenero() {
+        return genero;
+    }
 
-    public LocalDate getUltimoPago() { return ultimoPago; }
-    public void setUltimoPago(LocalDate ultimoPago) { this.ultimoPago = ultimoPago; }
+    public void setGenero(GeneroENUM genero) {
+        this.genero = genero;
+    }
 
-    public Double getAdeudoPendiente() { return adeudoPendiente; }
-    public void setAdeudoPendiente(Double adeudoPendiente) { this.adeudoPendiente = adeudoPendiente; }
+    // =========================================================
+    // DOMICILIO
+    // =========================================================
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public String getEstadoPais() {
+        return estadoPais;
+    }
+
+    public void setEstadoPais(String estadoPais) {
+        this.estadoPais = estadoPais;
+    }
+
+    public String getPais() {
+        return pais;
+    }
+
+    public void setPais(String pais) {
+        this.pais = pais;
+    }
+
+    // =========================================================
+    // CONTACTO
+    // =========================================================
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    // =========================================================
+    // ESTADO DEL RESIDENTE
+    // =========================================================
+
+    public EstadoResidenteENUM getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoResidenteENUM estado) {
+        this.estado = estado;
+    }
+
+    public Integer getPermiso_vehicular() {
+        return permiso_vehicular;
+    }
+
+    public void setPermiso_vehicular(Integer permiso_vehicular) {
+        this.permiso_vehicular = permiso_vehicular;
+    }
+
+    public String getCarrera() {
+        return carrera;
+    }
+
+    public void setCarrera(String carrera) {
+        this.carrera = carrera;
+    }
+    
+    
+    public Boolean IsDeportista() {
+        return isDeportista;
+    }
+
+    public void setIsDeportista(Boolean isDeportista) {
+        this.isDeportista = isDeportista;
+    }
+
+    public Boolean IsIntercambio() {
+        return isIntercambio;
+    }
+
+    public void setIsIntercambio(Boolean isIntercambio) {
+        this.isIntercambio = isIntercambio;
+    }
+
+    // =========================================================
+    // AVAL / FIADOR
+    // =========================================================
+
+    public String getNombreAval() {
+        return nombreAval;
+    }
+
+    public void setNombreAval(String nombreAval) {
+        this.nombreAval = nombreAval;
+    }
+
+    public String getParentescoAval() {
+        return parentescoAval;
+    }
+
+    public void setParentescoAval(String parentescoAval) {
+        this.parentescoAval = parentescoAval;
+    }
+
+    public String getTelefonoAval() {
+        return telefonoAval;
+    }
+
+    public void setTelefonoAval(String telefonoAval) {
+        this.telefonoAval = telefonoAval;
+    }
+
+    public String getCorreoAval() {
+        return correoAval;
+    }
+
+    public void setCorreoAval(String correoAval) {
+        this.correoAval = correoAval;
+    }
+
+    public String getDireccionAval() {
+        return direccionAval;
+    }
+
+    public void setDireccionAval(String direccionAval) {
+        this.direccionAval = direccionAval;
+    }
+
+    // =========================================================
+    // VEHÍCULO
+    // =========================================================
+
+    public String getModeloVehiculo() {
+        return modeloVehiculo;
+    }
+
+    public void setModeloVehiculo(String modeloVehiculo) {
+        this.modeloVehiculo = modeloVehiculo;
+    }
+
+    public String getColorVehiculo() {
+        return colorVehiculo;
+    }
+
+    public void setColorVehiculo(String colorVehiculo) {
+        this.colorVehiculo = colorVehiculo;
+    }
+
+    public String getPlacasVehiculo() {
+        return placasVehiculo;
+    }
+
+    public void setPlacasVehiculo(String placasVehiculo) {
+        this.placasVehiculo = placasVehiculo;
+    }
+
+    // =========================================================
+    // PLAN DE PAGO
+    // =========================================================
+
+    public EstadoPagoENUM getEstadoPago() {
+        return estadoPago;
+    }
+
+    public void setEstadoPago(EstadoPagoENUM estadoPago) {
+        this.estadoPago = estadoPago;
+    }
+
+    public LocalDate getUltimoPago() {
+        return ultimoPago;
+    }
+
+    public void setUltimoPago(LocalDate ultimoPago) {
+        this.ultimoPago = ultimoPago;
+    }
+
+    public Double getAdeudoPendiente() {
+        return adeudoPendiente;
+    }
+
+    public void setAdeudoPendiente(Double adeudoPendiente) {
+        this.adeudoPendiente = adeudoPendiente;
+    }
+
+    // =========================================================
+    // EQUALS / HASHCODE
+    // =========================================================
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 31 * hash + Objects.hashCode(this.id);
-        hash = 31 * hash + Objects.hashCode(this.fechaNacimiento);
-        return hash;
+        return Objects.hash(id);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        final Residente other = (Residente) obj;
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Residente other = (Residente) obj;
+
         return Objects.equals(this.id, other.id);
     }
+    
+    // =========================================================
+    // TO STRING
+    // =========================================================
 
     @Override
     public String toString() {
-        return "Residente{id=" + id + ", nombre=" + nombre + "}";
+        return "Residente{"
+                + "id=" + id
+                + ", nombre=" + nombre
+                + ", apellido_paterno=" + apellido_paterno
+                + ", apellido_materno=" + apellido_materno
+                + "}";
     }
 }

@@ -77,6 +77,9 @@ public class ResidentesDAO implements IResidentesDAO {
                 r.fechaIngreso,
                 r.genero,
                 r.direccion,
+                r.ciudad,
+                r.estado
+                r.pais,
                 r.correo,
                 r.telefono,
                 r.estado,
@@ -93,6 +96,8 @@ public class ResidentesDAO implements IResidentesDAO {
                 r.estadoPago,
                 r.ultimoPago,
                 r.adeudoPendiente
+                r.isDeportista,
+                r.isIntercambio
             )
             FROM Residente r
             WHERE r.id = :id
@@ -248,27 +253,17 @@ public class ResidentesDAO implements IResidentesDAO {
             r1.setFechaNacimiento(LocalDate.of(2004, 10, 11));
             r1.setGenero(GeneroENUM.HOMBRE);
             r1.setDireccion("Calle 1");
+            r1.setCiudad("Cd. Obregon");
+            r1.setEstadoPais("Sonora");
+            r1.setPais("Mexico");
             r1.setCorreo("jorge.cuevas252274@potros.itson.edu.mx");
             r1.setTelefono("6441222916");
             r1.setEstado(EstadoResidenteENUM.ACTIVO);
             r1.setPermiso_vehicular(1);
             r1.setCarrera("Ing. Software");
             r1.setEstadoPago(EstadoPagoENUM.AL_CORRIENTE);
-
-            Residente r2 = new Residente();
-            r2.setId("00000203020");
-            r2.setNombre("Joserra");
-            r2.setApellido_paterno("Reynaga");
-            r2.setApellido_materno("Nuñez");
-            r2.setFechaNacimiento(LocalDate.of(2005, 8, 21));
-            r2.setGenero(GeneroENUM.HOMBRE);
-            r2.setDireccion("Calle 2");
-            r2.setCorreo("joserra@itson.edu.mx");
-            r2.setTelefono("6445551234");
-            r2.setEstado(EstadoResidenteENUM.ACTIVO);
-            r2.setPermiso_vehicular(2);
-            r2.setCarrera("Ing. Software");
-            r2.setEstadoPago(EstadoPagoENUM.AL_CORRIENTE);
+            r1.setIsDeportista(Boolean.TRUE);
+            r1.setIsIntercambio(Boolean.FALSE);
 
             Residente r3 = new Residente();
             r3.setId("00000252825");
@@ -278,12 +273,17 @@ public class ResidentesDAO implements IResidentesDAO {
             r3.setFechaNacimiento(LocalDate.of(2001, 11, 3));
             r3.setGenero(GeneroENUM.HOMBRE);
             r3.setDireccion("Calle 3");
+            r3.setCiudad("Cd. Obregon");
+            r3.setEstadoPais("Sonora");
+            r3.setPais("Mexico");
             r3.setCorreo("ari@itson.edu.mx");
             r3.setTelefono("6447778888");
             r3.setEstado(EstadoResidenteENUM.ACTIVO);
             r3.setPermiso_vehicular(3);
             r3.setCarrera("Ing. Software");
             r3.setEstadoPago(EstadoPagoENUM.CON_DEUDA);
+            r3.setIsDeportista(Boolean.TRUE);
+            r3.setIsIntercambio(Boolean.FALSE);
 
             Residente r4 = new Residente();
             r4.setId("00000253017");
@@ -293,49 +293,22 @@ public class ResidentesDAO implements IResidentesDAO {
             r4.setFechaNacimiento(LocalDate.of(2005, 11, 3));
             r4.setGenero(GeneroENUM.MUJER);
             r4.setDireccion("Calle 4");
+            r4.setCiudad("Nogales");
+            r4.setEstadoPais("Sonora");
+            r4.setPais("Mexico");
             r4.setCorreo("abril@itson.edu.mx");
             r4.setTelefono("6447722888");
             r4.setEstado(EstadoResidenteENUM.ACTIVO);
             r4.setPermiso_vehicular(4);
             r4.setCarrera("Ing. Software");
             r4.setEstadoPago(EstadoPagoENUM.AL_CORRIENTE);
-
-            Residente r5 = new Residente();
-            r5.setId("00000249718");
-            r5.setNombre("Melissa");
-            r5.setApellido_paterno("Chavez");
-            r5.setApellido_materno("Gutierrez");
-            r5.setFechaNacimiento(LocalDate.of(2004, 11, 3));
-            r5.setGenero(GeneroENUM.MUJER);
-            r5.setDireccion("Calle 5");
-            r5.setCorreo("melissa@itson.edu.mx");
-            r5.setTelefono("6443378888");
-            r5.setEstado(EstadoResidenteENUM.ACTIVO);
-            r5.setPermiso_vehicular(5);
-            r5.setCarrera("Ing. Software");
-            r5.setEstadoPago(EstadoPagoENUM.MOROSO);
-
-            Residente r6 = new Residente();
-            r6.setId("00000250000");
-            r6.setNombre("Ivan");
-            r6.setApellido_paterno("Tapia");
-            r6.setApellido_materno("Moreno");
-            r6.setFechaNacimiento(LocalDate.of(1985, 11, 3));
-            r6.setGenero(GeneroENUM.HOMBRE);
-            r6.setDireccion("Calle 6");
-            r6.setCorreo("ivan.tapia@itson.edu.mx");
-            r6.setTelefono("6413378888");
-            r6.setEstado(EstadoResidenteENUM.INACTIVO);
-            r6.setPermiso_vehicular(6);
-            r6.setCarrera("Ing. Software");
-            r6.setEstadoPago(EstadoPagoENUM.CON_DEUDA);
+            r4.setIsDeportista(Boolean.FALSE);
+            r4.setIsIntercambio(Boolean.TRUE);
+            
 
             entityManager.persist(r1);
-            entityManager.persist(r2);
             entityManager.persist(r3);
-            entityManager.persist(r4);
-            entityManager.persist(r5);
-            entityManager.persist(r6);
+            entityManager.persist(r4);  
 
             tx.commit();
             System.out.println("Residentes mock insertados correctamente");
