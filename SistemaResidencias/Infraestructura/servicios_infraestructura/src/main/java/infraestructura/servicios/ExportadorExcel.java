@@ -1,182 +1,263 @@
 package infraestructura.servicios;
 
 import dtos.AsignacionReporteDTO;
-import enums.EstadoPagoENUM;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.*;
+import java.util.Map;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExportadorExcel {
 
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final String RUTA_PLANTILLA = "/LISTA_ASIGNACION.xlsx";
+    private static final String RUTA_LIBREOFFICE = "/opt/homebrew/bin/soffice";
 
-    public File exportarExcel(List<AsignacionReporteDTO> lista, String tituloReporte) throws Exception {
-        File archivo = File.createTempFile("lista_asignacion_", ".xlsx");
+    public File exportarExcel(
+            List<AsignacionReporteDTO> lista,
+            int cantidadDeportistas,
+            int cantidadExtranjeros) throws Exception {
 
-        try (XSSFWorkbook wb = new XSSFWorkbook();
-             FileOutputStream out = new FileOutputStream(archivo)) {
+        File archivo = File.createTempFile(
+                "ASIGNACION_AGOSTO_DICIEMBRE_2026_",
+                ".xlsx"
+        );
 
-            XSSFSheet hoja = wb.createSheet("Asignaciones");
+        try (
+                InputStream input =
+                        ExportadorExcel.class.getResourceAsStream(RUTA_PLANTILLA);
+                XSSFWorkbook workbook =
+                        input != null ? new XSSFWorkbook(input) : null
+        ) {
 
-            // ── Estilos ───────────────────────────────────────────────────────
-            XSSFCellStyle estTitulo  = estiloTitulo(wb);
-            XSSFCellStyle estSubt    = estiloSubtitulo(wb);
-            XSSFCellStyle estHeader  = estiloHeader(wb);
-            XSSFCellStyle estCeldaA  = estiloCelda(wb, true);
-            XSSFCellStyle estCeldaB  = estiloCelda(wb, false);
-            XSSFCellStyle estAlC     = estiloChip(wb, new byte[]{40,  (byte)160, 80});
-            XSSFCellStyle estDeuda   = estiloChip(wb, new byte[]{(byte)180, (byte)120, 10});
-            XSSFCellStyle estMoroso  = estiloChip(wb, new byte[]{(byte)200, 40, 40});
-
-            // ── Fila título ───────────────────────────────────────────────────
-            Row rowTitulo = hoja.createRow(0);
-            rowTitulo.setHeightInPoints(28);
-            Cell cTitulo = rowTitulo.createCell(0);
-            cTitulo.setCellValue(tituloReporte);
-            cTitulo.setCellStyle(estTitulo);
-            hoja.addMergedRegion(new CellRangeAddress(0, 0, 0, 4));
-
-            // ── Fila subtítulo ────────────────────────────────────────────────
-            Row rowSubt = hoja.createRow(1);
-            rowSubt.setHeightInPoints(18);
-            Cell cSubt = rowSubt.createCell(0);
-            cSubt.setCellValue("Total: " + lista.size() + " asignaciones  |  Generado: "
-                    + LocalDate.now().format(FMT));
-            cSubt.setCellStyle(estSubt);
-            hoja.addMergedRegion(new CellRangeAddress(1, 1, 0, 4));
-
-            // Fila vacía
-            hoja.createRow(2).setHeightInPoints(8);
-
-            // ── Fila de encabezados ───────────────────────────────────────────
-            Row rowHeader = hoja.createRow(3);
-            rowHeader.setHeightInPoints(22);
-            String[] cols = {"Habitación", "Nombre completo", "Carrera", "Piso", "Estado de pago"};
-            for (int i = 0; i < cols.length; i++) {
-                Cell c = rowHeader.createCell(i);
-                c.setCellValue(cols[i]);
-                c.setCellStyle(estHeader);
+            if (input == null) {
+                throw new FileNotFoundException(
+                        "No se encontró la plantilla: " + RUTA_PLANTILLA
+                );
             }
 
-            // ── Filas de datos ────────────────────────────────────────────────
-            int rowIdx = 4;
-            for (AsignacionReporteDTO d : lista) {
-                Row fila = hoja.createRow(rowIdx);
-                fila.setHeightInPoints(20);
-                boolean par = (rowIdx % 2 == 0);
-                XSSFCellStyle base = par ? estCeldaA : estCeldaB;
-
-                celda(fila, 0, d.getHabitacionTexto(), base);
-                celda(fila, 1, d.getNombreCompleto().trim(), base);
-                celda(fila, 2, d.getCarrera() != null ? d.getCarrera() : "—", base);
-                celda(fila, 3, d.getPisoTexto(), base);
-
-                // Estado de pago con color de fondo
-                XSSFCellStyle estEstado = chipParaEstado(wb, d.getEstadoPago(), estAlC, estDeuda, estMoroso);
-                celda(fila, 4, d.getEstadoPagoTexto(), estEstado);
-
-                rowIdx++;
+            if (workbook == null) {
+                throw new IllegalStateException(
+                        "No se pudo abrir la plantilla de Excel."
+                );
             }
 
-            // ── Anchos de columna ─────────────────────────────────────────────
-            int[] anchos = {14, 32, 28, 14, 18};
-            for (int i = 0; i < anchos.length; i++) {
-                hoja.setColumnWidth(i, anchos[i] * 256);
+            Sheet hoja = workbook.getSheet("ASIGNACION HABITACION");
+
+            if (hoja == null) {
+                throw new IllegalStateException(
+                        "No se encontró la hoja 'ASIGNACION HABITACION'."
+                );
             }
 
-            wb.write(out);
+            llenarHabitaciones(hoja, lista);
+
+            llenarContadores(
+                    hoja,
+                    cantidadDeportistas,
+                    cantidadExtranjeros
+            );
+
+            workbook.setForceFormulaRecalculation(true);
+
+            try (OutputStream output = Files.newOutputStream(archivo.toPath())) {
+                workbook.write(output);
+            }
         }
+
         return archivo;
     }
+    
+    private void llenarHabitaciones(Sheet hoja, List<AsignacionReporteDTO> lista) {
+        Map<String, List<String>> residentesPorHabitacion = new HashMap<>();
+        
+        if (lista != null) {
+            for (AsignacionReporteDTO asignacion : lista) {
 
-    // ── Helpers de estilo ─────────────────────────────────────────────────────
+                if (asignacion == null || asignacion.getNumeroHabitacion() == null) {
+                    continue;
+                }
+                
+                String numeroHabitacion = asignacion.getNumeroHabitacion().toString().trim();
+                String nombre = asignacion.getNombreCompleto();
 
-    private XSSFCellStyle estiloTitulo(XSSFWorkbook wb) {
-        XSSFCellStyle s = wb.createCellStyle();
-        XSSFFont f = wb.createFont();
-        f.setBold(true);
-        f.setFontHeightInPoints((short) 16);
-        f.setColor(new XSSFColor(new byte[]{55, 75, (byte)190}, null));
-        s.setFont(f);
-        s.setAlignment(HorizontalAlignment.LEFT);
-        s.setVerticalAlignment(VerticalAlignment.CENTER);
-        return s;
-    }
+                if (nombre == null) {
+                    continue;
+                }
 
-    private XSSFCellStyle estiloSubtitulo(XSSFWorkbook wb) {
-        XSSFCellStyle s = wb.createCellStyle();
-        XSSFFont f = wb.createFont();
-        f.setFontHeightInPoints((short) 10);
-        f.setColor(new XSSFColor(new byte[]{(byte)110, (byte)110, (byte)120}, null));
-        s.setFont(f);
-        s.setAlignment(HorizontalAlignment.LEFT);
-        s.setVerticalAlignment(VerticalAlignment.CENTER);
-        return s;
-    }
+                nombre = nombre.trim();
 
-    private XSSFCellStyle estiloHeader(XSSFWorkbook wb) {
-        XSSFCellStyle s = wb.createCellStyle();
-        s.setFillForegroundColor(new XSSFColor(new byte[]{55, 75, (byte)190}, null));
-        s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        XSSFFont f = wb.createFont();
-        f.setBold(true);
-        f.setColor(new XSSFColor(new byte[]{(byte)255, (byte)255, (byte)255}, null));
-        f.setFontHeightInPoints((short) 11);
-        s.setFont(f);
-        s.setAlignment(HorizontalAlignment.CENTER);
-        s.setVerticalAlignment(VerticalAlignment.CENTER);
-        s.setBorderBottom(BorderStyle.THIN);
-        s.setBottomBorderColor(new XSSFColor(new byte[]{55, 75, (byte)190}, null));
-        return s;
-    }
+                if (nombre.isEmpty()) {
+                    continue;
+                }
 
-    private XSSFCellStyle estiloCelda(XSSFWorkbook wb, boolean alterna) {
-        XSSFCellStyle s = wb.createCellStyle();
-        if (alterna) {
-            s.setFillForegroundColor(new XSSFColor(new byte[]{(byte)248, (byte)248, (byte)252}, null));
-            s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                // Evitamos agregar nombres duplicados exactamente iguales a la misma habitación
+                residentesPorHabitacion
+                        .computeIfAbsent(numeroHabitacion, k -> new ArrayList<>());
+                
+                List<String> residentes = residentesPorHabitacion.get(numeroHabitacion);
+                if (!residentes.contains(nombre)) {
+                    residentes.add(nombre);
+                }
+            }
         }
-        XSSFFont f = wb.createFont();
-        f.setFontHeightInPoints((short) 10);
-        s.setFont(f);
-        s.setVerticalAlignment(VerticalAlignment.CENTER);
-        s.setBorderBottom(BorderStyle.HAIR);
-        s.setBottomBorderColor(new XSSFColor(new byte[]{(byte)220, (byte)218, (byte)235}, null));
-        return s;
+
+        for (int fila = 7; fila <= 81; fila++) {
+
+            Row row = hoja.getRow(fila);
+
+            if (row == null) {
+                continue;
+            }
+
+            // Primer bloque (Izquierda)
+            colocarResidente(
+                    row,
+                    1, // Columna de número de habitación izq (B)
+                    2, // Columna de nombre izq (C)
+                    residentesPorHabitacion
+            );
+
+            // Segundo bloque (Derecha)
+            colocarResidente(
+                    row,
+                    3, // Columna de número de habitación der (D)
+                    4, // Columna de nombre der (E)
+                    residentesPorHabitacion
+            );
+        }
     }
 
-    private XSSFCellStyle estiloChip(XSSFWorkbook wb, byte[] rgb) {
-        XSSFCellStyle s = wb.createCellStyle();
-        s.setFillForegroundColor(new XSSFColor(rgb, null));
-        s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        XSSFFont f = wb.createFont();
-        f.setBold(true);
-        f.setFontHeightInPoints((short) 10);
-        f.setColor(new XSSFColor(new byte[]{(byte)255, (byte)255, (byte)255}, null));
-        s.setFont(f);
-        s.setAlignment(HorizontalAlignment.CENTER);
-        s.setVerticalAlignment(VerticalAlignment.CENTER);
-        return s;
+    private void colocarResidente(
+            Row row,
+            int columnaHabitacion,
+            int columnaNombre,
+            Map<String, List<String>> residentesPorHabitacion) {
+
+        Cell celdaHabitacion = row.getCell(columnaHabitacion);
+
+        if (celdaHabitacion == null) {
+            return;
+        }
+
+        String numeroHabitacion = obtenerNumeroHabitacion(celdaHabitacion);
+
+        if (numeroHabitacion == null || numeroHabitacion.isEmpty()) {
+            return;
+        }
+
+        List<String> residentes = residentesPorHabitacion.get(numeroHabitacion);
+
+        Cell celdaNombre = row.getCell(columnaNombre);
+        if (celdaNombre == null) {
+            celdaNombre = row.createCell(columnaNombre);
+        }
+
+        // Si hay residentes disponibles para esta habitación, colocamos y removemos el primero.
+        // Si ya no hay (ej. la habitación es individual o ya se colocaron todos), dejamos la celda en blanco.
+        if (residentes != null && !residentes.isEmpty()) {
+            String nombre = residentes.remove(0);
+            celdaNombre.setCellValue(nombre);
+        } else {
+            celdaNombre.setCellValue(""); 
+        }
     }
 
-    private XSSFCellStyle chipParaEstado(XSSFWorkbook wb, EstadoPagoENUM ep,
-            XSSFCellStyle alC, XSSFCellStyle deuda, XSSFCellStyle moroso) {
-        if (ep == null) return alC;
-        return switch (ep) {
-            case AL_CORRIENTE -> alC;
-            case CON_DEUDA    -> deuda;
-            case MOROSO       -> moroso;
-        };
+    private String obtenerNumeroHabitacion(Cell celda) {
+        if (celda == null) {
+            return null;
+        }
+
+        if (celda.getCellType() == CellType.NUMERIC) {
+            return String.valueOf((int) celda.getNumericCellValue());
+        }
+
+        if (celda.getCellType() == CellType.STRING) {
+            String valor = celda.getStringCellValue().trim();
+            if (valor.isEmpty()) {
+                return null;
+            }
+            return valor;
+        }
+
+        return null;
+    }
+     
+    private void llenarContadores(
+            Sheet hoja,
+            int cantidadDeportistas,
+            int cantidadExtranjeros) {
+
+        Row filaDeportistas = hoja.getRow(84);
+        if (filaDeportistas == null) {
+            filaDeportistas = hoja.createRow(84);
+        }
+
+        Cell celdaDeportistas = filaDeportistas.getCell(1);
+        if (celdaDeportistas == null) {
+            celdaDeportistas = filaDeportistas.createCell(1);
+        }
+        celdaDeportistas.setCellValue(cantidadDeportistas);
+
+        Row filaExtranjeros = hoja.getRow(85);
+        if (filaExtranjeros == null) {
+            filaExtranjeros = hoja.createRow(85);
+        }
+
+        Cell celdaExtranjeros = filaExtranjeros.getCell(1);
+        if (celdaExtranjeros == null) {
+            celdaExtranjeros = filaExtranjeros.createCell(1);
+        }
+        celdaExtranjeros.setCellValue(cantidadExtranjeros);
     }
 
-    private void celda(Row fila, int col, String valor, CellStyle estilo) {
-        Cell c = fila.createCell(col);
-        c.setCellValue(valor != null ? valor : "—");
-        c.setCellStyle(estilo);
+    public File convertirExcelAPdf(File excel) throws Exception {
+
+        Path directorioTemporal = Files.createTempDirectory("excel_pdf_");
+
+        ProcessBuilder pb = new ProcessBuilder(
+                RUTA_LIBREOFFICE,
+                "--headless",
+                "--convert-to",
+                "pdf",
+                "--outdir",
+                directorioTemporal.toString(),
+                excel.getAbsolutePath()
+        );
+
+        pb.redirectErrorStream(true);
+        Process proceso = pb.start();
+
+        String salida = new String(proceso.getInputStream().readAllBytes());
+        int resultado = proceso.waitFor();
+
+        if (resultado != 0) {
+            throw new IllegalStateException(
+                    "LibreOffice no pudo convertir el Excel a PDF.\n" + salida
+            );
+        }
+
+        String nombreSinExtension = excel.getName().replaceFirst("(?i)\\.xlsx$", "");
+
+        File pdf = directorioTemporal
+                .resolve(nombreSinExtension + ".pdf")
+                .toFile();
+
+        if (!pdf.exists()) {
+            throw new IllegalStateException(
+                    "LibreOffice terminó correctamente, pero no se encontró el PDF generado.\n" + salida
+            );
+        }
+
+        return pdf;
     }
 }

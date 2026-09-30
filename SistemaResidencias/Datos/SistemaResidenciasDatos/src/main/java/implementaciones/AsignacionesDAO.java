@@ -184,15 +184,37 @@ public class AsignacionesDAO implements IAsignacionesDAO {
 
             tx.begin();
 
-            Residente r1 = entityManager.find(Residente.class, "00000252825");
-            Residente r2 = entityManager.find(Residente.class, "00000203020");
+            Residente r1 = entityManager.find(
+                    Residente.class,
+                    "00000252825"
+            );
+
+            Residente r2 = entityManager.find(
+                    Residente.class,
+                    "00000252274"
+            );
 
             Habitacion h1 = entityManager.createQuery(
-                    "SELECT h FROM Habitacion h WHERE h.numero_habitacion = 1101",
+                    "SELECT h FROM Habitacion h WHERE h.numero_habitacion = :numero",
                     Habitacion.class
-            ).getSingleResult();
+            )
+            .setParameter("numero", 1101)
+            .getSingleResult();
+
+            if (r1 == null || r2 == null) {
+                throw new IllegalStateException(
+                        "No se encontraron los residentes necesarios para las asignaciones mock."
+                );
+            }
+
+            if (h1 == null) {
+                throw new IllegalStateException(
+                        "No se encontró la habitación 1101."
+                );
+            }
 
             AsignacionHabitacion a1 = new AsignacionHabitacion();
+
             a1.setResidente(r1);
             a1.setHabitacion(h1);
             a1.setFechaInicio(LocalDate.of(2025, 1, 10));
@@ -201,6 +223,7 @@ public class AsignacionesDAO implements IAsignacionesDAO {
             a1.setEstadoHabitacion(EstadoHabitacion.ACTIVA);
 
             AsignacionHabitacion a2 = new AsignacionHabitacion();
+
             a2.setResidente(r2);
             a2.setHabitacion(h1);
             a2.setFechaInicio(LocalDate.of(2025, 1, 10));
@@ -213,7 +236,7 @@ public class AsignacionesDAO implements IAsignacionesDAO {
 
             tx.commit();
 
-            System.out.println("Asignaciones mock insertadas");
+            System.out.println("Asignaciones mock insertadas correctamente");
 
         } catch (Exception e) {
 
@@ -224,5 +247,4 @@ public class AsignacionesDAO implements IAsignacionesDAO {
             e.printStackTrace();
         }
     }
-
 }

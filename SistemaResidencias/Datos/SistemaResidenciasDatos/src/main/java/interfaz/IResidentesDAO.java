@@ -19,4 +19,7 @@ public interface IResidentesDAO {
     void eliminarResidentePorId(String id);
     void crearResidentesMock();
     void limpiarBaseDatos();
+
+    public int getIntercambios();
+    public int getDeportistas();
 }

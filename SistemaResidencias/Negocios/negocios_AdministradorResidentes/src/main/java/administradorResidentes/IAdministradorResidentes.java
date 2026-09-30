@@ -20,4 +20,7 @@ public interface IAdministradorResidentes {
     void guardarResidente(ResidenteDTO dto);
     void actualizarResidente(ResidenteDTO dto);
     void desactivarResidente(String id);
+    
+    int getDeportistas();
+    int getIntercambios();
 }

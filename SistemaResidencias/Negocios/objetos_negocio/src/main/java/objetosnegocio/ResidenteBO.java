@@ -71,6 +71,16 @@ public class ResidenteBO {
         IAccesoDatos accesoDatos = new AccesoDatos();
         accesoDatos.actualizarResidente(dto);
     }
+    
+    public int obtenerDeportistas() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.getDeportistas();
+    }
+    
+    public int obtenerIntercambios() {
+        IAccesoDatos accesoDatos = new AccesoDatos();
+        return accesoDatos.getIntercambios();
+    }
 
     public void desactivarResidente(String id) {
         IAccesoDatos accesoDatos = new AccesoDatos();

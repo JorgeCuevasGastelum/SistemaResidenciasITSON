@@ -68,4 +68,14 @@ public class AdministradorResidentes implements IAdministradorResidentes {
     public void desactivarResidente(String id) {
         residenteBO.desactivarResidente(id);
     }
+
+    @Override
+    public int getDeportistas() {
+        return residenteBO.obtenerDeportistas();
+    }
+
+    @Override
+    public int getIntercambios() {
+        return residenteBO.obtenerIntercambios();
+    }
 }

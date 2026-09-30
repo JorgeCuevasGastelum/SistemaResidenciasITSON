@@ -161,7 +161,7 @@ public class SistemaResidenciasMain {
             vista.setControlGestionar(controlGestionar);
 
             ListaAsignacionControl controlLista = new ListaAsignacionControl(
-                    adminAsignaciones, adminHabitaciones);
+                    adminAsignaciones, adminHabitaciones, adminResidentes);
             vista.setControlLista(controlLista);
 
             vista.addWindowListener(new java.awt.event.WindowAdapter() {

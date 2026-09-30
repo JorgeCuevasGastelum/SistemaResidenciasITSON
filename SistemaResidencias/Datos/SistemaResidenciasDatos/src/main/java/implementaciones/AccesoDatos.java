@@ -188,4 +188,14 @@ public class AccesoDatos implements IAccesoDatos {
     public void limpiarBaseDatos() {
         residentesDAO.limpiarBaseDatos();
     }
+
+    @Override
+    public int getDeportistas() {
+        return residentesDAO.getDeportistas();
+    }
+
+    @Override
+    public int getIntercambios() {
+        return residentesDAO.getIntercambios();
+    }
 }

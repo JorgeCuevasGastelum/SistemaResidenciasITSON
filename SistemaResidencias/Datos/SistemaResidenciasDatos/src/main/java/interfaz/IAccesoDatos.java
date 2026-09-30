@@ -38,4 +38,8 @@ public interface IAccesoDatos {
 
     void crearDatosMock();
     void limpiarBaseDatos();
+
+    public int getDeportistas();
+
+    public int getIntercambios();
 }
